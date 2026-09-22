@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class QuickRigging {
-    //addMotor - returns a DcMotor with specified params. Called from teleop.
+    //addMotor - returns a new DcMotor with specified params. Called from teleop. Pass in hardwaremap and driverstation name
 
 
     public static DcMotor addMotor(HardwareMap hardwareMap, String DSName, boolean Direction, boolean Stop) {
@@ -28,6 +28,8 @@ public class QuickRigging {
         obj.setZeroPowerBehavior(Stop ? DcMotor.ZeroPowerBehavior.BRAKE : DcMotor.ZeroPowerBehavior.FLOAT);
         return obj;
     }
+
+
 
 }
 

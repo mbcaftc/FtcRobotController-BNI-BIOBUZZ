@@ -98,9 +98,23 @@ public class FastRobotTester extends OpMode{
         limelight.start();
     }
 
+    //Poll limelight before start is pressed
+    @Override
+    public void init_loop() {
+        if(usingLimelight) {
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
+            } else {
+                telemetry.addData("Limelight Status", "Connecting... (Ensure Panels is closed)");
+            }
+            telemetry.update();
+        }
+    }
+
     public void limeLightData() {
         result = limelight.getLatestResult();
-        if (result.isValid()) {
+        if (result != null && result.isValid()) {
             // Access fiducial results
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
