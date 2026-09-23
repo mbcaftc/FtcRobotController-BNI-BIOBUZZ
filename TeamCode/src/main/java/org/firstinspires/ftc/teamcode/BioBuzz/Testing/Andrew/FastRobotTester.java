@@ -42,7 +42,7 @@ public class FastRobotTester extends OpMode{
     public boolean usingODO = true;
     public boolean usingExMotors = false;
     public boolean usingEncoderMotor = true;
-    public boolean invertForwardDirection = true;
+    public boolean invertForwardDirection = false;
     public boolean usingLimelight = true;
     public boolean usingLED = false;
 
@@ -67,10 +67,10 @@ public class FastRobotTester extends OpMode{
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         imu.resetYaw();
         //Init Mecanum Drive
-        FrontRight = addMotor(hardwareMap, "FR", false, true);
-        FrontLeft = addMotor(hardwareMap, "FL", true, true);
-        BackRight = addMotor(hardwareMap, "BR", false, true);
-        BackLeft = addMotor(hardwareMap, "BL", true, true);
+        FrontRight = addMotor(hardwareMap, "FR", true, true);
+        FrontLeft = addMotor(hardwareMap, "FL", false, true);
+        BackRight = addMotor(hardwareMap, "BR", true, true);
+        BackLeft = addMotor(hardwareMap, "BL", false, true);
 
         //Initialize the odometry, read function desc.
         if(usingODO) {
@@ -103,6 +103,13 @@ public class FastRobotTester extends OpMode{
     public void init_loop() {
         if(usingLimelight) {
             LLResult result = limelight.getLatestResult();
+            telemetry.addData("Is Valid? ", result.isValid());
+            telemetry.addData("Is Null? ", result == null);
+            telemetry.addData("Limelight is connected? ", limelight.isConnected());
+            telemetry.addData("Pipeline: ", limelight.getStatus().getPipelineIndex());
+            telemetry.addData("Results size: ", result.getFiducialResults().size());
+            telemetry.addData("Staleness: ", result.getStaleness());
+
             if (result != null && result.isValid()) {
                 telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
             } else {
@@ -232,7 +239,7 @@ public class FastRobotTester extends OpMode{
         telemetry.addLine("---------------Tester Program---------------");
         if (usingODO) {
             telemetry.addData("Robot Pose", "X: %.2f, Y: %.2f, Heading: %.2f",
-                    odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), Math.toDegrees(odo.getHeading(AngleUnit.DEGREES)));
+                    odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), odo.getHeading(AngleUnit.DEGREES));
         }
         if (usingEncoderMotor) {
             telemetry.addData("Encoder value: ", MotorEx1.getCurrentPosition());
@@ -246,7 +253,7 @@ public class FastRobotTester extends OpMode{
     @Override
     public void loop(){
         //Robot Centric Drive - Mecanum, 4 wheel
-        robotCentricDrive(FrontRight, FrontLeft, BackRight, BackLeft);
+        robotCentricDrive(FrontLeft, FrontRight, BackRight, BackLeft);
         //Odometry
         if(usingODO) {
             odo.update();
