@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
@@ -90,7 +91,7 @@ public class TeleOP extends OpMode{
 
     public void limeLightData() {
         result = limelight.getLatestResult();
-        if (result != null && result.isValid()) {
+        /*if (result != null && result.isValid()) {
             // Access fiducial results
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
@@ -98,14 +99,15 @@ public class TeleOP extends OpMode{
             }
         } else {
             telemetry.addData("Limelight", "No data available");
-        }
+        }*/
     }
 
     public void autoTarget() {
         if (gamepad1.b) {
-
             double RFavgX = 0;
             double RFavgY = 0;
+            double RFang = 0;
+            double RFYoffset = 0;
             int RFTags = 0;
 
             double BFavgX = 0;
@@ -114,6 +116,8 @@ public class TeleOP extends OpMode{
 
             double RBavgX = 0;
             double RBavgY = 0;
+            double RBang = 0;
+            double RBYoffset = 0;
             int RBTags = 0;
 
             double BBavgX = 0;
@@ -124,17 +128,23 @@ public class TeleOP extends OpMode{
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
 
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
+
+                Pose3D targetPose = fr.getTargetPoseCameraSpace();
                 //RedBack Cluster
                 if (fr.getFiducialId() >= 30 && fr.getFiducialId() <= 33) {
                     RBTags++;
                     RBavgX += fr.getTargetXDegrees();
                     RBavgY += fr.getTargetYDegrees();
+                    RBang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                    RBYoffset += targetPose.getPosition().y;
                 }
                 //RedFront Cluster
                 if (fr.getFiducialId() >= 34 && fr.getFiducialId() <= 37) {
                     RFTags++;
                     RFavgX += fr.getTargetXDegrees();
                     RFavgY += fr.getTargetYDegrees();
+                    RFang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                    RFYoffset += targetPose.getPosition().y;
                 }
                 //BlueFront Cluster
                 if (fr.getFiducialId() >= 38 && fr.getFiducialId() <= 41) {
@@ -154,18 +164,24 @@ public class TeleOP extends OpMode{
             //Average all X and Y values based on how many tags were detected
             RFavgX /= RFTags;
             RFavgY /= RFTags;
+            RFang  /= RFTags;
+            RFYoffset /= RFTags;
+
             BFavgX /= BFTags;
             BFavgY /= BFTags;
-            RBavgX /= RBTags;
 
+            RBavgX /= RBTags;
             RBavgY /= RBTags;
+            RBang  /= RBTags;
+            RBYoffset /= RBTags;
+
             BBavgX /= BBTags;
             BBavgY /= BBTags;
 
 
-            telemetry.addData("Red Front: ", "X: %.2f, Y: %.2f", RFavgX, RFavgY);
+            telemetry.addData("Red Front: ", "X: %.2f, Y: %.2f, Deg: %.2f, Yoffset: %.2f", RFavgX, RFavgY, RFang, RFYoffset);
             telemetry.addData("Blue Front: ", "X: %.2f, Y: %.2f", BFavgX, BFavgY);
-            telemetry.addData("Red Back: ", "X: %.2f, Y: %.2f", RBavgX, RBavgY);
+            telemetry.addData("Red Back: ", "X: %.2f, Y: %.2f, Deg: %.2f, Yoffset: %.2f", RBavgX, RBavgY, RBang, RBYoffset);
             telemetry.addData("Blue Back: ", "X: %.2f, Y: %.2f", BBavgX, BBavgY);
 
 

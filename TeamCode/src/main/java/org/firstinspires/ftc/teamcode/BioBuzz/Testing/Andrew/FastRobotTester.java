@@ -39,11 +39,11 @@ public class FastRobotTester extends OpMode{
 
      ----------------------------**/
 
-    public boolean usingODO = true;
-    public boolean usingExMotors = false;
-    public boolean usingEncoderMotor = true;
+    public boolean usingODO = false;
+    public boolean usingExMotors = true;
+    public boolean usingEncoderMotor = false;
     public boolean invertForwardDirection = false;
-    public boolean usingLimelight = true;
+    public boolean usingLimelight = false;
     public boolean usingLED = false;
 
     public DcMotor MotorEx1;
