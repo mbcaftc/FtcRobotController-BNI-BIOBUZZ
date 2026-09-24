@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotor;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addServo;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -28,12 +29,13 @@ public class TeleOP extends OpMode{
     private double speedMultiply = .75;
 
     //Auto Correct X Variation
-    double autoVariation = 3;
+    double autoVariation = 1;
 
     //Autocorrect rotation speed
     double autoSpeed = .5;
 
     public IMU imu = null;
+    public Servo led;
 
     @Override
     public void init() {
@@ -52,6 +54,9 @@ public class TeleOP extends OpMode{
         BackLeft = addMotor(hardwareMap, "BL", false, true);
 
         initOdo(0, 25, true, false);
+
+        //Init led
+        led = addServo(hardwareMap, "LED", true);
 
         initLimelight();
     }
@@ -75,8 +80,10 @@ public class TeleOP extends OpMode{
         telemetry.addData("Staleness: ", result.getStaleness());
         if (limelight.isConnected()) {
             telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
+            LEDCon(led, 6);
         } else {
             telemetry.addData("Limelight Status", "Connecting... (Ensure Panels is closed)");
+            LEDCon(led, 1);
         }
         telemetry.update();
     }
@@ -162,21 +169,30 @@ public class TeleOP extends OpMode{
             telemetry.addData("Blue Back: ", "X: %.2f, Y: %.2f", BBavgX, BBavgY);
 
 
+
+
             //Move according to midpoint
             if(RFTags > 0) {
                 if (RFavgX < -autoVariation) {
                     //Turn Left
+                    autoSpeed = .039 * (Math.abs(RFavgX) - autoVariation) +.1;
                     setMotorPower(FrontLeft, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(FrontRight, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackLeft, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackRight, -autoSpeed, powerThreshold, speedMultiply);
+                    LEDCon(led, 6);
                 }
-                if (RFavgX > autoVariation) {
+                else if (RFavgX > autoVariation) {
                     //Turn Right
+                    autoSpeed = .039 * (Math.abs(RFavgX) - autoVariation) +.1;
                     setMotorPower(FrontLeft, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(FrontRight, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackLeft, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackRight, autoSpeed, powerThreshold, speedMultiply);
+                    LEDCon(led, 6);
+                }
+                else {
+                    LEDCon(led, 4);
                 }
             }
         }
