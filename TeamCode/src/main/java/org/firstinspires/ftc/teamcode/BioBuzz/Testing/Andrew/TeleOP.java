@@ -26,15 +26,12 @@ public class TeleOP extends OpMode{
     protected Limelight3A limelight;
     //Limelight Cam data
     protected LLResult result;
-
     private double speedMultiply = .75;
 
     //Auto Correct X Variation
     double autoVariation = 1;
-
     //Autocorrect rotation speed
     double autoSpeed = .5;
-
     public IMU imu = null;
     public Servo led;
 
@@ -59,10 +56,6 @@ public class TeleOP extends OpMode{
         //Init led
         led = addServo(hardwareMap, "LED", true);
 
-        initLimelight();
-    }
-
-    public void initLimelight(){
         //Init the limelight camera for April Tag detection
         limelight = hardwareMap.get(Limelight3A.class, "LL");
         limelight.pipelineSwitch(0);
@@ -73,12 +66,6 @@ public class TeleOP extends OpMode{
     @Override
     public void init_loop() {
         LLResult result = limelight.getLatestResult();
-        telemetry.addData("Is Valid? ", result.isValid());
-        telemetry.addData("Is Null? ", result == null);
-        telemetry.addData("Limelight is connected? ", limelight.isConnected());
-        telemetry.addData("Pipeline: ", limelight.getStatus().getPipelineIndex());
-        telemetry.addData("Results size: ", result.getFiducialResults().size());
-        telemetry.addData("Staleness: ", result.getStaleness());
         if (limelight.isConnected()) {
             telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
             LEDCon(led, 6);
@@ -89,20 +76,8 @@ public class TeleOP extends OpMode{
         telemetry.update();
     }
 
-    public void limeLightData() {
-        result = limelight.getLatestResult();
-        /*if (result != null && result.isValid()) {
-            // Access fiducial results
-            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-            }
-        } else {
-            telemetry.addData("Limelight", "No data available");
-        }*/
-    }
-
     public void autoTarget() {
+        result = limelight.getLatestResult();
         if (gamepad1.b) {
             double RFavgX = 0;
             double RFavgY = 0;
@@ -178,42 +153,53 @@ public class TeleOP extends OpMode{
             BBavgX /= BBTags;
             BBavgY /= BBTags;
 
+            //Check if any tags are being seen
+            if(RFTags > 0 || RBTags > 0) {
+                //Take the lower of the 2 y values as the higher hive
+                boolean front = RFYoffset < RBYoffset;
+                //If no tags are seen from the other hive, then just target the one seen
+                if(RFTags == 0){
+                    front = false;
+                }
+                if(RBTags == 0){
+                    front = true;
+                }
 
-            telemetry.addData("Red Front: ", "X: %.2f, Y: %.2f, Deg: %.2f, Yoffset: %.2f", RFavgX, RFavgY, RFang, RFYoffset);
-            telemetry.addData("Blue Front: ", "X: %.2f, Y: %.2f", BFavgX, BFavgY);
-            telemetry.addData("Red Back: ", "X: %.2f, Y: %.2f, Deg: %.2f, Yoffset: %.2f", RBavgX, RBavgY, RBang, RBYoffset);
-            telemetry.addData("Blue Back: ", "X: %.2f, Y: %.2f", BBavgX, BBavgY);
+
+                telemetry.addData("Target Hive: ", front ? "Red Front" : "Red Back");
+
+                telemetry.addData("Red Front: ", "X: %.2f, Y: %.2f, Deg: %.2f, Yoffset: %.2f", RFavgX, RFavgY, RFang, RFYoffset);
+                telemetry.addData("Blue Front: ", "X: %.2f, Y: %.2f", BFavgX, BFavgY);
+                telemetry.addData("Red Back: ", "X: %.2f, Y: %.2f, Deg: %.2f, Yoffset: %.2f", RBavgX, RBavgY, RBang, RBYoffset);
+                telemetry.addData("Blue Back: ", "X: %.2f, Y: %.2f", BBavgX, BBavgY);
 
 
+                //Set the target hive as the higher (lesser y offset) of the 2 or the one seen
+                double avgX = front ? RFavgX : RBavgX;
 
-
-            //Move according to midpoint
-            if(RFTags > 0) {
-                if (RFavgX < -autoVariation) {
+                //Move according to midpoint of hive
+                if (avgX < -autoVariation) {
                     //Turn Left
-                    autoSpeed = .039 * (Math.abs(RFavgX) - autoVariation) +.1;
+                    autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
                     setMotorPower(FrontLeft, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(FrontRight, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackLeft, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackRight, -autoSpeed, powerThreshold, speedMultiply);
                     LEDCon(led, 6);
-                }
-                else if (RFavgX > autoVariation) {
+                } else if (avgX > autoVariation) {
                     //Turn Right
-                    autoSpeed = .039 * (Math.abs(RFavgX) - autoVariation) +.1;
+                    autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
                     setMotorPower(FrontLeft, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(FrontRight, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackLeft, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackRight, autoSpeed, powerThreshold, speedMultiply);
                     LEDCon(led, 6);
-                }
-                else {
+                } else {
                     LEDCon(led, 4);
                 }
             }
         }
     }
-
 
     public void initOdo(double xOffset, double yOffset, boolean xDirection, boolean yDirection){
         /*
@@ -328,11 +314,11 @@ public class TeleOP extends OpMode{
     public void loop(){
         //Robot Centric Drive - Mecanum, 4 wheel
         robotCentricDrive(FrontLeft, FrontRight, BackRight, BackLeft);
+
         //Odometry
         odo.update();
 
         //Limelight and targeting
-        limeLightData();
         autoTarget();
 
         //Telemetry
