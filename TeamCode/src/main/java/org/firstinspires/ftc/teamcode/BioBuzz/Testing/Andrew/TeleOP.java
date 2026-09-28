@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotor;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addPrismDriver;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addServo;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -33,6 +35,7 @@ public class TeleOP extends OpMode{
     //Autocorrect rotation speed
     double autoSpeed = .5;
     public IMU imu = null;
+    public RevBlinkinLedDriver LEDStrip;
     public Servo led;
 
     @Override
@@ -60,6 +63,9 @@ public class TeleOP extends OpMode{
         limelight = hardwareMap.get(Limelight3A.class, "LL");
         limelight.pipelineSwitch(0);
         limelight.start();
+
+        //Add LED Strip
+        LEDStrip = addPrismDriver(hardwareMap, "PRISM");
     }
 
     //Poll limelight before start is pressed

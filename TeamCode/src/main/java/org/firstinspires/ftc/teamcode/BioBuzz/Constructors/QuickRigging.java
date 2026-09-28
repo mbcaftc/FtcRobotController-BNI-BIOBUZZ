@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Constructors;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -52,6 +53,14 @@ public class QuickRigging {
         CRServo obj;
         obj = hardwareMap.get(CRServo.class, DSName);
         obj.setDirection(Direction ? DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE);
+        return obj;
+    }
+
+    public static RevBlinkinLedDriver addPrismDriver(HardwareMap hardwareMap, String DSName) {
+        //Adds a Gobilda RGB Prism Led driver, params are (Name of led)
+        RevBlinkinLedDriver obj;
+        obj = hardwareMap.get(RevBlinkinLedDriver.class, DSName);
+        obj.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
         return obj;
     }
 

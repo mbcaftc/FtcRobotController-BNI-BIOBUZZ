@@ -55,15 +55,15 @@ public class Tuning {
     @Tuner
     public static Procedure foresightTuner() {
         return new ForesightTuner(
-                hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
-                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig));
+                hardwareMap -> new PinpointLocalizer(hardwareMap, ProgramConstants.localizerConfig),
+                hardwareMap -> new Mecanum(hardwareMap, ProgramConstants.drivetrainConfig));
     }
 
     @Tuner
     public static Procedure tests() {
         return new Tests(
-                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig),
-                hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
-                () -> new Foresight(Constants.foresightConfig));
+                hardwareMap -> new Mecanum(hardwareMap, ProgramConstants.drivetrainConfig),
+                hardwareMap -> new PinpointLocalizer(hardwareMap, ProgramConstants.localizerConfig),
+                () -> new Foresight(ProgramConstants.foresightConfig));
     }
 }

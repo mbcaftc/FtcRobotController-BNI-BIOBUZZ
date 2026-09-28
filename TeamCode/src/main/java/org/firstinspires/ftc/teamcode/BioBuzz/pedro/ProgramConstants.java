@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class Constants {
+public class ProgramConstants {
     public static MecanumConfig drivetrainConfig = new MecanumConfig(c ->
     {
         c.frontLeftName.set("FL");
