@@ -8,13 +8,43 @@ import com.pedropathing.tuning.autotune.Tuner;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.ForesightTuner;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.MecanumTuner;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.OTOSTuner;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.OctoQuadTuner;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.PinpointTuner;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.Tests;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.ThreeWheelIMUTuner;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.ThreeWheelTuner;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.procedures.TwoWheelTuner;
 
 public class Tuning {
     @Tuner
     public static Procedure pinpointTuner() {
         return new PinpointTuner();
+    }
+
+    @Tuner
+    public static Procedure otosTuner() {
+        return new OTOSTuner();
+    }
+
+    @Tuner
+    public static Procedure octoQuadTuner() {
+        return new OctoQuadTuner();
+    }
+
+    @Tuner
+    public static Procedure twoWheelTuner() {
+        return new TwoWheelTuner();
+    }
+
+    @Tuner
+    public static Procedure threeWheelTuner() {
+        return new ThreeWheelTuner();
+    }
+
+    @Tuner
+    public static Procedure threeWheelIMUTuner() {
+        return new ThreeWheelIMUTuner();
     }
 
     @Tuner
@@ -36,5 +66,4 @@ public class Tuning {
                 hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
                 () -> new Foresight(Constants.foresightConfig));
     }
-    // Tuners go here
 }
