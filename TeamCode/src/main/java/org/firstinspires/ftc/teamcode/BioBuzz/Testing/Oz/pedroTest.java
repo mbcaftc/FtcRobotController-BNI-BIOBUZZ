@@ -7,7 +7,7 @@ import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.BioBuzz.pedro.Constants;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.ProgramConstants;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class pedroTest extends OpMode {
 
     @Override
     public void init() {
-        follower = Constants.create(hardwareMap);
+        follower = ProgramConstants.create(hardwareMap);
         follower.setPose(start);
         paths = EasyCreate.create(start, path1, point2, point3);
     }

@@ -1,24 +1,24 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
-import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotor;
-import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addPrismDriver;
-import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addServo;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.*;
+
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.GoBildaPrismDriver;
+import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations;
 
 import java.util.List;
 
@@ -28,50 +28,60 @@ public class TeleOP extends OpMode{
     protected Limelight3A limelight;
     //Limelight Cam data
     protected LLResult result;
-    private double speedMultiply = .75;
 
     //Auto Correct X Variation
     double autoVariation = 1;
     //Autocorrect rotation speed
     double autoSpeed = .5;
     public IMU imu = null;
-    public RevBlinkinLedDriver LEDStrip;
+    public GoBildaPrismDriver LEDStrip;
     public Servo led;
+
+    //Motor Init
+    public DcMotor intakeMotor;
+    public DcMotorEx launcherMotor;
+    public CRServo transferServo;
+
+    PrismAnimations.RainbowSnakes solid = new PrismAnimations.RainbowSnakes();
+
+
 
     @Override
     public void init() {
-        //IMU for Rev Robotics Control Hub
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu = hardwareMap.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        imu.resetYaw();
+        //Init IMU
+        imu = addIMU(hardwareMap, "imu", true, false);
 
         //Init Mecanum Drive
-        FrontRight = addMotor(hardwareMap, "FR", true, true);
-        FrontLeft = addMotor(hardwareMap, "FL", false, true);
-        BackRight = addMotor(hardwareMap, "BR", true, true);
-        BackLeft = addMotor(hardwareMap, "BL", false, true);
+        FrontRight = addMotor(hardwareMap, "FR", false, true);
+        FrontLeft = addMotor(hardwareMap, "FL", true, true);
+        BackRight = addMotor(hardwareMap, "BR", false, true);
+        BackLeft = addMotor(hardwareMap, "BL", true, true);
 
-        initOdo(0, 25, true, false);
+        //Extra Motors
+        intakeMotor = addMotor(hardwareMap, "intake", true, true);
+        launcherMotor = addMotorEx(hardwareMap, "launcher", true, true, true);
+
+        //Init transfer servo
+        transferServo = addCRServo(hardwareMap, "transfer", true);
+
+        //Init odometry
+        odo = addOdometry(hardwareMap, "ODO", 0, 25, true, false);
 
         //Init led
         led = addServo(hardwareMap, "LED", true);
 
         //Init the limelight camera for April Tag detection
-        limelight = hardwareMap.get(Limelight3A.class, "LL");
-        limelight.pipelineSwitch(0);
-        limelight.start();
+        limelight = addLimelight(hardwareMap, "LL");
 
         //Add LED Strip
-        LEDStrip = addPrismDriver(hardwareMap, "PRISM");
+        LEDStrip = hardwareMap.get(GoBildaPrismDriver.class, "PRISM");
+
+        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, solid);
     }
 
     //Poll limelight before start is pressed
     @Override
     public void init_loop() {
-        LLResult result = limelight.getLatestResult();
         if (limelight.isConnected()) {
             telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
             LEDCon(led, 6);
@@ -184,6 +194,7 @@ public class TeleOP extends OpMode{
                 double avgX = front ? RFavgX : RBavgX;
 
                 //Move according to midpoint of hive
+                double speedMultiply = .75;
                 if (avgX < -autoVariation) {
                     //Turn Left
                     autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
@@ -207,40 +218,7 @@ public class TeleOP extends OpMode{
         }
     }
 
-    public void initOdo(double xOffset, double yOffset, boolean xDirection, boolean yDirection){
-        /*
-             ╔════════════════╗
-             ║        X+      ║
-             ║        ▲       ║
-             ║        │       ║
-             ║ Y+ ◄───┼───►Y- ║
-             ║        │       ║
-             ║        ▼       ║
-             ║        X-      ║
-             ╚════════════════╝
 
-             On odometry pods, if the pod rotates clockwise
-             to increase X or Y, set direction to true.
-             If counterclockwise, false.
-             Smalls: true, true
-             10219 Program bot: true, false
-         */
-
-
-
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "ODO");
-        odo.setOffsets(xOffset, yOffset, DistanceUnit.INCH);
-
-        //Set the resolution of the odometery
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //Change the direction of the odometry pods, controlled by the xDirection and yDirection vars.
-        odo.setEncoderDirections(xDirection ? GoBildaPinpointDriver.EncoderDirection.FORWARD : GoBildaPinpointDriver.EncoderDirection.REVERSED,
-                yDirection ? GoBildaPinpointDriver.EncoderDirection.FORWARD : GoBildaPinpointDriver.EncoderDirection.REVERSED
-                );
-
-        // Flushes data based on the new offsets
-        odo.resetPosAndIMU();
-    }
 
     // Drivetrain Variables
     protected double leftStickYVal;
@@ -311,10 +289,31 @@ public class TeleOP extends OpMode{
     }
 
     public void runTelemetry() {
-        telemetry.addLine("---------------Tester Program---------------");
+        telemetry.addLine("---------------TeleOp---------------");
         telemetry.addData("Robot Pose", "X: %.2f, Y: %.2f, Heading: %.2f", odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), odo.getHeading(AngleUnit.DEGREES));
         telemetry.update();
     }
+
+    boolean launcherTrigger = false;
+    boolean intakeTrigger = false;
+    boolean transferTrigger = false;
+
+    public void inputHandling(){
+        //Toggle launcher
+        if(gamepad1.rightTriggerWasPressed()){launcherTrigger = !launcherTrigger;}
+        //Toggle intake
+        if(gamepad1.leftTriggerWasPressed()){intakeTrigger = !intakeTrigger;}
+        //Toggle transfer servo
+        if(gamepad1.aWasPressed()){transferTrigger = !transferTrigger;}
+    }
+
+    public void runMotors(){
+        intakeMotor.setPower(intakeTrigger ? 0 : -1);
+        launcherMotor.setPower(launcherTrigger ? 0 : 1);
+        transferServo.setPower(transferTrigger ? 0 : 1);
+        telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
+    }
+
 
     @Override
     public void loop(){
@@ -323,6 +322,12 @@ public class TeleOP extends OpMode{
 
         //Odometry
         odo.update();
+
+        //Control the input triggers
+        inputHandling();
+
+        //Drive all the motors based on triggers
+        runMotors();
 
         //Limelight and targeting
         autoTarget();
