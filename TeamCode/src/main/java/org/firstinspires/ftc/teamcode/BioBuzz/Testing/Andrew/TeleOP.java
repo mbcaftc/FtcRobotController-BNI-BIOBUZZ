@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.*;
 
-
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -14,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -25,73 +25,49 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOP", group = "Drive")
 public class TeleOP extends OpMode{
     public TeleOP() {}
-    protected Limelight3A limelight;
+    //<editor-fold desc="AutoTargeting Variables">
     //Limelight Cam data
     protected LLResult result;
-
     //Auto Correct X Variation
     double autoVariation = 1;
     //Autocorrect rotation speed
     double autoSpeed = .5;
+    //</editor-fold>
+
+    //<editor-fold desc="Component Initializations">
     public IMU imu = null;
+    protected Limelight3A limelight;
     public GoBildaPrismDriver LEDStrip;
     public Servo led;
-
-    //Motor Init
     public DcMotor intakeMotor;
     public DcMotorEx launcherMotor;
     public CRServo transferServo;
+    public DcMotor FrontRight;
+    public DcMotor FrontLeft;
+    public DcMotor BackRight;
+    public DcMotor BackLeft;
+    public GoBildaPinpointDriver odo;
+    public CRServo turretServo;
+    //</editor-fold>
 
-    PrismAnimations.RainbowSnakes solid = new PrismAnimations.RainbowSnakes();
+    //<editor-fold desc="Drivetrain Variables">
+    protected double leftStickYVal;
+    protected double leftStickXVal;
+    protected double rightStickYVal;
+    protected double rightStickXVal;
+    protected double frontLeftSpeed;
+    protected double frontRightSpeed;
+    protected double rearLeftSpeed;
+    protected double rearRightSpeed;
+    protected double powerThreshold;
+    public double moveSpeedMultiply = 1;
+    //</editor-fold>
 
-
-
-    @Override
-    public void init() {
-        //Init IMU
-        imu = addIMU(hardwareMap, "imu", true, false);
-
-        //Init Mecanum Drive
-        FrontRight = addMotor(hardwareMap, "FR", false, true);
-        FrontLeft = addMotor(hardwareMap, "FL", true, true);
-        BackRight = addMotor(hardwareMap, "BR", false, true);
-        BackLeft = addMotor(hardwareMap, "BL", true, true);
-
-        //Extra Motors
-        intakeMotor = addMotor(hardwareMap, "intake", true, true);
-        launcherMotor = addMotorEx(hardwareMap, "launcher", true, true, true);
-
-        //Init transfer servo
-        transferServo = addCRServo(hardwareMap, "transfer", true);
-
-        //Init odometry
-        odo = addOdometry(hardwareMap, "ODO", 0, 25, true, false);
-
-        //Init led
-        led = addServo(hardwareMap, "LED", true);
-
-        //Init the limelight camera for April Tag detection
-        limelight = addLimelight(hardwareMap, "LL");
-
-        //Add LED Strip
-        LEDStrip = hardwareMap.get(GoBildaPrismDriver.class, "PRISM");
-
-        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, solid);
-    }
-
-    //Poll limelight before start is pressed
-    @Override
-    public void init_loop() {
-        if (limelight.isConnected()) {
-            telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
-            LEDCon(led, 6);
-        } else {
-            telemetry.addData("Limelight Status", "Connecting... (Ensure Panels is closed)");
-            LEDCon(led, 1);
-        }
-        telemetry.update();
-    }
-
+    //<editor-fold desc="Button Triggers">
+    boolean launcherTrigger = false;
+    boolean intakeTrigger = false;
+    boolean transferTrigger = false;
+    //</editor-fold>
     public void autoTarget() {
         result = limelight.getLatestResult();
         if (gamepad1.b) {
@@ -217,27 +193,6 @@ public class TeleOP extends OpMode{
             }
         }
     }
-
-
-
-    // Drivetrain Variables
-    protected double leftStickYVal;
-    protected double leftStickXVal;
-    protected double rightStickYVal;
-    protected double rightStickXVal;
-    protected double frontLeftSpeed;
-    protected double frontRightSpeed;
-    protected double rearLeftSpeed;
-    protected double rearRightSpeed;
-    protected double powerThreshold;
-    public double moveSpeedMultiply = 1;
-
-    public DcMotor FrontRight;
-    public DcMotor FrontLeft;
-    public DcMotor BackRight;
-    public DcMotor BackLeft;
-    public GoBildaPinpointDriver odo;
-
     public void LEDCon(Servo LED, int color) {
         /*Set the color of the LED to one of 6 colors, 0 being off.
         0 : Turn off LED
@@ -287,17 +242,12 @@ public class TeleOP extends OpMode{
             motor.setPower(speed * multiplier);
         }
     }
-
     public void runTelemetry() {
         telemetry.addLine("---------------TeleOp---------------");
         telemetry.addData("Robot Pose", "X: %.2f, Y: %.2f, Heading: %.2f", odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), odo.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
         telemetry.update();
     }
-
-    boolean launcherTrigger = false;
-    boolean intakeTrigger = false;
-    boolean transferTrigger = false;
-
     public void inputHandling(){
         //Toggle launcher
         if(gamepad1.rightTriggerWasPressed()){launcherTrigger = !launcherTrigger;}
@@ -306,15 +256,57 @@ public class TeleOP extends OpMode{
         //Toggle transfer servo
         if(gamepad1.aWasPressed()){transferTrigger = !transferTrigger;}
     }
-
     public void runMotors(){
+        //Apply motor power based on established triggers from inputHandling()
         intakeMotor.setPower(intakeTrigger ? 0 : -1);
         launcherMotor.setPower(launcherTrigger ? 0 : 1);
         transferServo.setPower(transferTrigger ? 0 : 1);
-        telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
+
+        //Move the transfer servo with += .1 deadzone
+        turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
     }
+    @Override
+    public void init() {
+        //Init IMU
+        imu = addIMU(hardwareMap, "imu", true, false);
 
+        //Init Mecanum Drive
+        FrontRight = addMotor(hardwareMap, "FR", false, true);
+        FrontLeft = addMotor(hardwareMap, "FL", true, true);
+        BackRight = addMotor(hardwareMap, "BR", false, true);
+        BackLeft = addMotor(hardwareMap, "BL", true, true);
 
+        //Extra Motors
+        intakeMotor = addMotor(hardwareMap, "intake", true, true);
+        launcherMotor = addMotorEx(hardwareMap, "launcher", true, true, true);
+
+        //Init servos
+        transferServo = addCRServo(hardwareMap, "transfer", true);
+        turretServo = addCRServo(hardwareMap, "turret", true);
+
+        //Init odometry
+        odo = addOdometry(hardwareMap, "ODO", 0, 25, true, false);
+
+        //Init LEDs
+        led = addServo(hardwareMap, "LED", true);
+        LEDStrip = hardwareMap.get(GoBildaPrismDriver.class, "PRISM");
+        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.SineWave());
+
+        //Init the limelight camera for April Tag detection
+        limelight = addLimelight(hardwareMap, "LL");
+    }
+    @Override
+    public void init_loop() {
+        //Poll limelight before start is pressed
+        if (limelight.isConnected()) {
+            telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
+            LEDCon(led, 6);
+        } else {
+            telemetry.addData("Limelight Status", "Connecting... (Ensure Panels is closed)");
+            LEDCon(led, 1);
+        }
+        telemetry.update();
+    }
     @Override
     public void loop(){
         //Robot Centric Drive - Mecanum, 4 wheel
