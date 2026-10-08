@@ -4,6 +4,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -120,6 +121,9 @@ public class QuickRigging {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         imu.resetYaw();
         return imu;
+    }
+    public static AnalogInput addAnalogueInput(HardwareMap hardwareMap, String DSName){
+        return hardwareMap.get(AnalogInput.class, DSName);
     }
 
 }

@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -32,6 +33,8 @@ public class TeleOP extends OpMode{
     double autoVariation = 1;
     //Autocorrect rotation speed
     double autoSpeed = .5;
+    double pastAxonPosition = 0;
+    double totalAxonTravel = 0;
     //</editor-fold>
 
     //<editor-fold desc="Component Initializations">
@@ -48,6 +51,7 @@ public class TeleOP extends OpMode{
     public DcMotor BackLeft;
     public GoBildaPinpointDriver odo;
     public CRServo turretServo;
+    public AnalogInput turretPosition;
     //</editor-fold>
 
     //<editor-fold desc="Drivetrain Variables">
@@ -68,6 +72,8 @@ public class TeleOP extends OpMode{
     boolean intakeTrigger = false;
     boolean transferTrigger = false;
     //</editor-fold>
+    †
+    public double pollenTargetVelocity = 600;
     public void autoTarget() {
         result = limelight.getLatestResult();
         if (gamepad1.b) {
@@ -246,7 +252,25 @@ public class TeleOP extends OpMode{
         telemetry.addLine("---------------TeleOp---------------");
         telemetry.addData("Robot Pose", "X: %.2f, Y: %.2f, Heading: %.2f", odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), odo.getHeading(AngleUnit.DEGREES));
         telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
+        telemetry.addData("Axon Position: %.2f Degrees", totalAxonTravel / 2.5);
         telemetry.update();
+    }
+    public void turretPosition(){
+        double pos = (turretPosition.getVoltage() / 3.3) * 360;
+        double delta = pos - pastAxonPosition;
+
+        // 4. FIX THE ROLLOVER: If it jumps instantly by more than half a rotation,
+        // it means the encoder just passed the 360/0 line.
+        if (delta > 180) {
+            // Wrapped backwards across the 0 line
+            delta -= 360;
+        } else if (delta < -180) {
+            // Wrapped forwards across the 360 line
+            delta += 360;
+        }
+        totalAxonTravel += delta;
+        pastAxonPosition = pos;
+
     }
     public void inputHandling(){
         //Toggle launcher
@@ -284,6 +308,9 @@ public class TeleOP extends OpMode{
         transferServo = addCRServo(hardwareMap, "transfer", true);
         turretServo = addCRServo(hardwareMap, "turret", true);
 
+        //Analogue Input
+        turretPosition = addAnalogueInput(hardwareMap, "axon");
+
         //Init odometry
         odo = addOdometry(hardwareMap, "ODO", 0, 25, true, false);
 
@@ -294,6 +321,9 @@ public class TeleOP extends OpMode{
 
         //Init the limelight camera for April Tag detection
         limelight = addLimelight(hardwareMap, "LL");
+
+        //Init axon position
+        pastAxonPosition = (turretPosition.getVoltage() / 3.3) * 360;
     }
     @Override
     public void init_loop() {
@@ -317,6 +347,9 @@ public class TeleOP extends OpMode{
 
         //Control the input triggers
         inputHandling();
+
+        //Update the turret position
+        turretPosition();
 
         //Drive all the motors based on triggers
         runMotors();
