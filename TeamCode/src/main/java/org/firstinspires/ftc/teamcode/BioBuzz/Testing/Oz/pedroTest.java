@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.ProgramConstants;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -18,6 +20,37 @@ public class pedroTest extends PoseMain {
     private Follower follower;
     private final Map<PathState, Path> paths = new EnumMap<>(PathState.class);
     private boolean pathStarted;
+
+    private enum PathState {
+        FIRST_PATH(start, path1),
+        SECOND_PATH(path1, point2),
+        THIRD_PATH(point2, point3),
+        FINISHED,
+        LOW_TIME,
+        WAIT_FOR_RETURN_PATH,
+        ULTRA_LOW_TIME;
+
+        // Each path definition contains exactly: name, start pose, end pose.
+        private final Object[] definition;
+
+        PathState(Pose startPose, Pose endPose) {
+            definition = new Object[] {name(), startPose, endPose};
+        }
+
+        PathState() {
+            definition = null;
+        }
+
+        static List<Object[]> pathDefinitions() {
+            List<Object[]> definitions = new ArrayList<>();
+            for (PathState state : values()) {
+                if (state.definition != null) {
+                    definitions.add(state.definition.clone());
+                }
+            }
+            return definitions;
+        }
+    }
 
     private PathState pathState;
     private boolean finished;
