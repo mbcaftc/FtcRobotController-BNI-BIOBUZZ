@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations;
@@ -26,6 +25,43 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOP", group = "Drive")
 public class TeleOP extends OpMode{
     public TeleOP() {}
+    /*CURRENT CONFIG*/
+    /*
+    * ---Control Hub Params---
+    * Motors:
+    * 0-FL
+    * 1-BL
+    * 2-BR
+    * 3-FR
+    *
+    * ---Expansion Hub Params---
+    * Motors:
+    * 0-intake
+    * 1-launcher
+    *
+    * Servos:
+    * (CRServos)
+    * 0-transfer
+    * 1-turret
+    * (Servo)
+    * 2-LED
+    *
+    * Analog Input Devices
+    * (Analog Input)
+    * 0-axon
+    *
+    * I2C Bus:
+    * (REV internal IMU (BNO055))
+    * Bus 0-imu
+    * (GoBilda Pinpoint Odometry Computer)
+    * Bus 1-ODO
+    * (GoBildaPrism RGB Driver)
+    * 3-PRISM
+    *
+    * ---Other Devices---
+    * Limelight - LL
+    *
+    * */
     //<editor-fold desc="AutoTargeting Variables">
     //Limelight Cam data
     protected LLResult result;
@@ -35,8 +71,8 @@ public class TeleOP extends OpMode{
     double autoSpeed = .5;
     double pastAxonPosition = 0;
     double totalAxonTravel = 0;
+    double turretCurrentHeading = 0;
     //</editor-fold>
-
     //<editor-fold desc="Component Initializations">
     public IMU imu = null;
     protected Limelight3A limelight;
@@ -51,9 +87,8 @@ public class TeleOP extends OpMode{
     public DcMotor BackLeft;
     public GoBildaPinpointDriver odo;
     public CRServo turretServo;
-    public AnalogInput turretPosition;
+    public AnalogInput axonFeedback;
     //</editor-fold>
-
     //<editor-fold desc="Drivetrain Variables">
     protected double leftStickYVal;
     protected double leftStickXVal;
@@ -66,14 +101,16 @@ public class TeleOP extends OpMode{
     protected double powerThreshold;
     public double moveSpeedMultiply = 1;
     //</editor-fold>
-
     //<editor-fold desc="Button Triggers">
     boolean launcherTrigger = false;
     boolean intakeTrigger = false;
     boolean transferTrigger = false;
     //</editor-fold>
-    †
+    //<editor-fold desc="Launching Variables">
     public double pollenTargetVelocity = 600;
+    public double nectarTargetVelocity = 800;
+    
+    //</editor-fold>
     public void autoTarget() {
         result = limelight.getLatestResult();
         if (gamepad1.b) {
@@ -180,18 +217,22 @@ public class TeleOP extends OpMode{
                 if (avgX < -autoVariation) {
                     //Turn Left
                     autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
+                    turretServo.setPower(autoSpeed);
+                    /*
                     setMotorPower(FrontLeft, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(FrontRight, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackLeft, autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(BackRight, -autoSpeed, powerThreshold, speedMultiply);
+                    setMotorPower(BackRight, -autoSpeed, powerThreshold, speedMultiply);*/
                     LEDCon(led, 6);
                 } else if (avgX > autoVariation) {
                     //Turn Right
                     autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
+                    turretServo.setPower(-autoSpeed);
+                    /*
                     setMotorPower(FrontLeft, -autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(FrontRight, autoSpeed, powerThreshold, speedMultiply);
                     setMotorPower(BackLeft, -autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(BackRight, autoSpeed, powerThreshold, speedMultiply);
+                    setMotorPower(BackRight, autoSpeed, powerThreshold, speedMultiply);*/
                     LEDCon(led, 6);
                 } else {
                     LEDCon(led, 4);
@@ -250,13 +291,13 @@ public class TeleOP extends OpMode{
     }
     public void runTelemetry() {
         telemetry.addLine("---------------TeleOp---------------");
-        telemetry.addData("Robot Pose", "X: %.2f, Y: %.2f, Heading: %.2f", odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), odo.getHeading(AngleUnit.DEGREES));
         telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
-        telemetry.addData("Axon Position: %.2f Degrees", totalAxonTravel / 2.5);
+        telemetry.addData("Pollen Target Velocity", pollenTargetVelocity);
+        telemetry.addData("Axon Position: %.2f Degrees", turretCurrentHeading);
         telemetry.update();
     }
-    public void turretPosition(){
-        double pos = (turretPosition.getVoltage() / 3.3) * 360;
+    public void calcTurretPos(){
+        double pos = (axonFeedback.getVoltage() / 3.3) * 360;
         double delta = pos - pastAxonPosition;
 
         // 4. FIX THE ROLLOVER: If it jumps instantly by more than half a rotation,
@@ -269,6 +310,7 @@ public class TeleOP extends OpMode{
             delta += 360;
         }
         totalAxonTravel += delta;
+        turretCurrentHeading = totalAxonTravel / 2.5;
         pastAxonPosition = pos;
 
     }
@@ -279,12 +321,14 @@ public class TeleOP extends OpMode{
         if(gamepad1.leftTriggerWasPressed()){intakeTrigger = !intakeTrigger;}
         //Toggle transfer servo
         if(gamepad1.aWasPressed()){transferTrigger = !transferTrigger;}
+        if(gamepad1.dpad_down){pollenTargetVelocity--;}
+        if(gamepad1.dpad_up){pollenTargetVelocity++;}
     }
     public void runMotors(){
         //Apply motor power based on established triggers from inputHandling()
-        intakeMotor.setPower(intakeTrigger ? 0 : -1);
-        launcherMotor.setPower(launcherTrigger ? 0 : 1);
-        transferServo.setPower(transferTrigger ? 0 : 1);
+        intakeMotor.setPower(intakeTrigger ? -1 : 0);
+        launcherMotor.setVelocity(launcherTrigger ? pollenTargetVelocity : 0);
+        transferServo.setPower(transferTrigger ? 1 : 0);
 
         //Move the transfer servo with += .1 deadzone
         turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
@@ -308,8 +352,9 @@ public class TeleOP extends OpMode{
         transferServo = addCRServo(hardwareMap, "transfer", true);
         turretServo = addCRServo(hardwareMap, "turret", true);
 
+
         //Analogue Input
-        turretPosition = addAnalogueInput(hardwareMap, "axon");
+        axonFeedback = addAnalogueInput(hardwareMap, "axon");
 
         //Init odometry
         odo = addOdometry(hardwareMap, "ODO", 0, 25, true, false);
@@ -323,7 +368,7 @@ public class TeleOP extends OpMode{
         limelight = addLimelight(hardwareMap, "LL");
 
         //Init axon position
-        pastAxonPosition = (turretPosition.getVoltage() / 3.3) * 360;
+        pastAxonPosition = (axonFeedback.getVoltage() / 3.3) * 360;
     }
     @Override
     public void init_loop() {
@@ -349,7 +394,7 @@ public class TeleOP extends OpMode{
         inputHandling();
 
         //Update the turret position
-        turretPosition();
+        calcTurretPos();
 
         //Drive all the motors based on triggers
         runMotors();

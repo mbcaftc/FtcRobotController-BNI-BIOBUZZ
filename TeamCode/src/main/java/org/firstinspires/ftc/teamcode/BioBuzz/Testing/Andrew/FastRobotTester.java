@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -53,6 +54,9 @@ public class FastRobotTester extends OpMode{
     protected LLResult result;
 
     public boolean motor1on = false;
+    public CRServo s1;
+    public CRServo s2;
+    public CRServo s3;
 
 
     public IMU imu = null;
@@ -67,10 +71,14 @@ public class FastRobotTester extends OpMode{
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         imu.resetYaw();
         //Init Mecanum Drive
-        FrontRight = addMotor(hardwareMap, "FR", true, true);
+        FrontRight = addMotor(hardwareMap, "FR", false, true);
         FrontLeft = addMotor(hardwareMap, "FL", false, true);
-        BackRight = addMotor(hardwareMap, "BR", true, true);
+        BackRight = addMotor(hardwareMap, "BR", false, true);
         BackLeft = addMotor(hardwareMap, "BL", false, true);
+
+        s1 = addCRServo(hardwareMap, "s1", true);
+        s2 = addCRServo(hardwareMap, "s2", false);
+        s3 = addCRServo(hardwareMap, "s3", false);
 
         //Initialize the odometry, read function desc.
         if(usingODO) {
@@ -78,8 +86,8 @@ public class FastRobotTester extends OpMode{
         }
 
         if(usingExMotors) {
-            MotorEx1 = addMotor(hardwareMap, "MotorEx1", true, false);
-            MotorEx2 = addMotor(hardwareMap, "MotorEx2", true, false);
+            MotorEx1 = addMotor(hardwareMap, "MotorEx1", false, false);
+            MotorEx2 = addMotor(hardwareMap, "MotorEx2", false, false);
         }
 
         if(usingEncoderMotor) {
@@ -266,6 +274,11 @@ public class FastRobotTester extends OpMode{
             MotorEx1.setPower(motor1on ? -1 : 0);
             MotorEx2.setPower(motor1on ? -1 : 0);
         }
+
+        s1.setPower(gamepad1.right_trigger);
+        s2.setPower(gamepad1.right_trigger);
+        s3.setPower(gamepad1.right_trigger);
+
 
     }
 }
