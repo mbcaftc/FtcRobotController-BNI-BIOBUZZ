@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -46,6 +48,8 @@ public class FastRobotTester extends OpMode{
     public boolean invertForwardDirection = false;
     public boolean usingLimelight = false;
     public boolean usingLED = false;
+    public boolean config1 = true;
+    public float currSpeed = 0.5f;
 
     public DcMotor MotorEx1;
     public DcMotor MotorEx2;
@@ -53,10 +57,14 @@ public class FastRobotTester extends OpMode{
     //Limelight Cam data
     protected LLResult result;
 
+
     public boolean motor1on = false;
+    public boolean motor2on = false;
+    public boolean servos = false;
     public CRServo s1;
     public CRServo s2;
     public CRServo s3;
+
 
 
     public IMU imu = null;
@@ -86,8 +94,8 @@ public class FastRobotTester extends OpMode{
         }
 
         if(usingExMotors) {
-            MotorEx1 = addMotor(hardwareMap, "MotorEx1", false, false);
-            MotorEx2 = addMotor(hardwareMap, "MotorEx2", false, false);
+            MotorEx1 = addMotor(hardwareMap, "LW", true, false);
+            MotorEx2 = addMotor(hardwareMap, "IN", true, false);
         }
 
         if(usingEncoderMotor) {
@@ -218,10 +226,17 @@ public class FastRobotTester extends OpMode{
         rightStickXVal = gamepad1.right_stick_x;
         rightStickXVal = Range.clip(rightStickXVal, -1, 1);
 
-        frontLeftSpeed = leftStickYVal - rightStickXVal - leftStickXVal;    // Vertical + Rotation + Staffing
-        frontRightSpeed = leftStickYVal + rightStickXVal + leftStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
-        rearLeftSpeed = leftStickYVal + rightStickXVal - leftStickXVal;
-        rearRightSpeed = leftStickYVal - rightStickXVal + leftStickXVal;
+        if(config1) {
+            frontLeftSpeed = leftStickYVal - rightStickXVal - leftStickXVal;    // Vertical + Rotation + Staffing
+            frontRightSpeed = leftStickYVal + rightStickXVal + leftStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
+            rearLeftSpeed = leftStickYVal + rightStickXVal - leftStickXVal;
+            rearRightSpeed = leftStickYVal - rightStickXVal + leftStickXVal;
+        }else {
+            frontLeftSpeed = leftStickYVal - leftStickXVal - rightStickXVal;    // Vertical + Rotation + Staffing
+            frontRightSpeed = leftStickYVal + leftStickXVal + rightStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
+            rearLeftSpeed = leftStickYVal + leftStickXVal - rightStickXVal;
+            rearRightSpeed = leftStickYVal - leftStickXVal + rightStickXVal;
+        }
 
         // Clipping motor speeds to [-1, 1]
         frontLeftSpeed = Range.clip(frontLeftSpeed, -1, 1);
@@ -267,17 +282,25 @@ public class FastRobotTester extends OpMode{
             odo.update();
         }
         //Telemetry
-        runTelemetry();
-        //Run motor
-        if(usingExMotors) {
-            motor1on = gamepad1.a || (!gamepad1.b && motor1on);
-            MotorEx1.setPower(motor1on ? -1 : 0);
-            MotorEx2.setPower(motor1on ? -1 : 0);
-        }
 
-        s1.setPower(gamepad1.right_trigger);
-        s2.setPower(gamepad1.right_trigger);
-        s3.setPower(gamepad1.right_trigger);
+
+        if(gamepad1.bWasPressed()){servos = !servos;}
+
+
+
+        s1.setPower(gamepad2.x ? 1 : 0);
+        s2.setPower(servos ? -1 : 0);
+        s3.setPower(servos ? 1 : 0);
+        if(gamepad2.dpad_down){currSpeed -= .01f; }
+        if(gamepad2.dpad_up){currSpeed += .01f;}
+        currSpeed = Range.clip(currSpeed, -1, 1);
+        telemetry.addLine("Gamepad 1: \nX:Intake on\nCircle: Intake off\n\nGamepad2:\nX: Launcher on\nCircle: Launcher off\nSquare: Feed Launcher");
+        telemetry.addData("Current Speed:", currSpeed);
+        motor1on = gamepad1.a || (!gamepad1.b && motor1on);
+        MotorEx1.setPower(motor1on ? currSpeed : 0);
+        motor2on = gamepad2.a || (!gamepad2.b && motor2on);
+        MotorEx2.setPower(motor2on ? 1 : 0);
+        runTelemetry();
 
 
     }

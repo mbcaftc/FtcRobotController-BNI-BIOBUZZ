@@ -90,6 +90,7 @@ public class TeleOP extends OpMode{
     public AnalogInput axonFeedback;
     //</editor-fold>
     //<editor-fold desc="Drivetrain Variables">
+    public boolean config1 = true;
     protected double leftStickYVal;
     protected double leftStickXVal;
     protected double rightStickYVal;
@@ -265,10 +266,17 @@ public class TeleOP extends OpMode{
         rightStickXVal = gamepad1.right_stick_x;
         rightStickXVal = Range.clip(rightStickXVal, -1, 1);
 
-        frontLeftSpeed = leftStickYVal - rightStickXVal - leftStickXVal;    // Vertical + Rotation + Staffing
-        frontRightSpeed = leftStickYVal + rightStickXVal + leftStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
-        rearLeftSpeed = leftStickYVal + rightStickXVal - leftStickXVal;
-        rearRightSpeed = leftStickYVal - rightStickXVal + leftStickXVal;
+        if(config1) {
+            frontLeftSpeed = leftStickYVal - rightStickXVal - leftStickXVal;    // Vertical + Rotation + Staffing
+            frontRightSpeed = leftStickYVal + rightStickXVal + leftStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
+            rearLeftSpeed = leftStickYVal + rightStickXVal - leftStickXVal;
+            rearRightSpeed = leftStickYVal - rightStickXVal + leftStickXVal;
+        }else {
+            frontLeftSpeed = leftStickYVal - leftStickXVal - rightStickXVal;    // Vertical + Rotation + Staffing
+            frontRightSpeed = leftStickYVal + leftStickXVal + rightStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
+            rearLeftSpeed = leftStickYVal + leftStickXVal - rightStickXVal;
+            rearRightSpeed = leftStickYVal - leftStickXVal + rightStickXVal;
+        }
 
         // Clipping motor speeds to [-1, 1]
         frontLeftSpeed = Range.clip(frontLeftSpeed, -1, 1);
@@ -294,6 +302,7 @@ public class TeleOP extends OpMode{
         telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
         telemetry.addData("Pollen Target Velocity", pollenTargetVelocity);
         telemetry.addData("Axon Position: %.2f Degrees", turretCurrentHeading);
+        telemetry.addData("Using Default config: ", config1);
         telemetry.update();
     }
     public void calcTurretPos(){
@@ -323,6 +332,7 @@ public class TeleOP extends OpMode{
         if(gamepad1.aWasPressed()){transferTrigger = !transferTrigger;}
         if(gamepad1.dpad_down){pollenTargetVelocity--;}
         if(gamepad1.dpad_up){pollenTargetVelocity++;}
+        if(gamepad1.xWasPressed()){config1 = !config1;}
     }
     public void runMotors(){
         //Apply motor power based on established triggers from inputHandling()
