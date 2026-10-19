@@ -72,7 +72,7 @@ public class TeleOP extends OpMode{
     boolean intakeTrigger = false;
     boolean transferTrigger = false;
     //</editor-fold>
-    †
+
     public double pollenTargetVelocity = 600;
     public void autoTarget() {
         result = limelight.getLatestResult();
