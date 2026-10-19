@@ -51,8 +51,8 @@ public class FastRobotTester extends OpMode{
     public boolean config1 = true;
     public float currSpeed = 0.5f;
 
-    public DcMotor MotorEx1;
-    public DcMotor MotorEx2;
+    public DcMotor LW;
+    public DcMotor IN;
     protected Limelight3A limelight;
     //Limelight Cam data
     protected LLResult result;
@@ -85,7 +85,7 @@ public class FastRobotTester extends OpMode{
         BackLeft = addMotor(hardwareMap, "BL", false, true);
 
         s1 = addCRServo(hardwareMap, "s1", true);
-        s2 = addCRServo(hardwareMap, "s2", false);
+        s2 = addCRServo(hardwareMap, "s2", true);
         s3 = addCRServo(hardwareMap, "s3", false);
 
         //Initialize the odometry, read function desc.
@@ -94,12 +94,12 @@ public class FastRobotTester extends OpMode{
         }
 
         if(usingExMotors) {
-            MotorEx1 = addMotor(hardwareMap, "LW", true, false);
-            MotorEx2 = addMotor(hardwareMap, "IN", true, false);
+            LW = addMotor(hardwareMap, "LW", true, false);
+            IN = addMotor(hardwareMap, "IN", true, false);
         }
 
         if(usingEncoderMotor) {
-            MotorEx1 = addMotor(hardwareMap, "MotorEx1", true, false, true);
+            LW = addMotor(hardwareMap, "LW", true, false, true);
         }
 
         if(usingLimelight){
@@ -265,7 +265,7 @@ public class FastRobotTester extends OpMode{
                     odo.getPosX(DistanceUnit.MM), odo.getPosY(DistanceUnit.MM), odo.getHeading(AngleUnit.DEGREES));
         }
         if (usingEncoderMotor) {
-            telemetry.addData("Encoder value: ", MotorEx1.getCurrentPosition());
+            telemetry.addData("Encoder value: ", LW.getCurrentPosition());
         }
         if(usingLimelight){
             limeLightData();
@@ -284,24 +284,28 @@ public class FastRobotTester extends OpMode{
         //Telemetry
 
 
-        if(gamepad1.bWasPressed()){servos = !servos;}
-
-
-
-        s1.setPower(gamepad2.x ? 1 : 0);
-        s2.setPower(servos ? -1 : 0);
+        //GP1
+        if(gamepad1.a){servos = true;}
+        if(gamepad1.b){servos = false;}
+        s2.setPower(servos ? 1 : 0);
         s3.setPower(servos ? 1 : 0);
+        IN.setPower(servos ? 1 : 0);
+
+
+
+
+        //GP2
         if(gamepad2.dpad_down){currSpeed -= .01f; }
         if(gamepad2.dpad_up){currSpeed += .01f;}
         currSpeed = Range.clip(currSpeed, -1, 1);
-        telemetry.addLine("Gamepad 1: \nX:Intake on\nCircle: Intake off\n\nGamepad2:\nX: Launcher on\nCircle: Launcher off\nSquare: Feed Launcher");
+        s1.setPower(gamepad2.x ? 1 : 0);
+        if(gamepad2.a){motor1on = true;}
+        if(gamepad2.b){motor1on = false;}
+        LW.setPower(motor1on ? currSpeed : 0);
+
+
+        telemetry.addLine("Gamepad 1: \nA:Intake on\nB: Intake off\n\nGamepad2:\nA: Launcher on\nB: Launcher off\nX: Fan On\nDpad: Velocity Control");
         telemetry.addData("Current Speed:", currSpeed);
-        motor1on = gamepad1.a || (!gamepad1.b && motor1on);
-        MotorEx1.setPower(motor1on ? currSpeed : 0);
-        motor2on = gamepad2.a || (!gamepad2.b && motor2on);
-        MotorEx2.setPower(motor2on ? 1 : 0);
         runTelemetry();
-
-
     }
 }

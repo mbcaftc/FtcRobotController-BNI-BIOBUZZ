@@ -45,6 +45,8 @@ public class TeleOP extends OpMode{
     * 1-turret
     * (Servo)
     * 2-LED
+    * (CRServo)
+    * 3-pollen
     *
     * Analog Input Devices
     * (Analog Input)
@@ -87,6 +89,7 @@ public class TeleOP extends OpMode{
     public DcMotor BackLeft;
     public GoBildaPinpointDriver odo;
     public CRServo turretServo;
+    public CRServo pollenServo;
     public AnalogInput axonFeedback;
     //</editor-fold>
     //<editor-fold desc="Drivetrain Variables">
@@ -339,6 +342,7 @@ public class TeleOP extends OpMode{
         intakeMotor.setPower(intakeTrigger ? -1 : 0);
         launcherMotor.setVelocity(launcherTrigger ? pollenTargetVelocity : 0);
         transferServo.setPower(transferTrigger ? 1 : 0);
+        pollenServo.setPower(transferTrigger ? -1 : 0);
 
         //Move the transfer servo with += .1 deadzone
         turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
@@ -361,6 +365,7 @@ public class TeleOP extends OpMode{
         //Init servos
         transferServo = addCRServo(hardwareMap, "transfer", true);
         turretServo = addCRServo(hardwareMap, "turret", true);
+        pollenServo = addCRServo(hardwareMap, "pollen", true);
 
 
         //Analogue Input
