@@ -64,7 +64,7 @@ public class pedroTest extends PoseMain {
     @Override
     public void init() {
         runTimer = new Timer();
-        follower = ProgramConstants.create(hardwareMap);
+        follower = ProgramConstants.createFollower(hardwareMap);
         follower.setPose(start);
         paths.clear();
         for (Object[] definition : PathState.pathDefinitions()) {

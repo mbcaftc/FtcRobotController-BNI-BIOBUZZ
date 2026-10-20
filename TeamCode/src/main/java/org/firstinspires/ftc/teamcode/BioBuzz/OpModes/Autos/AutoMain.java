@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos;
 
+import static com.pedropathing.api.Paths.line;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 
 
-
+import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.AtomicPath;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.curves.Line;
+import com.pedropathing.paths.PathSegment;
+import com.pedropathing.utils.Timer;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -24,14 +27,18 @@ import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class AutoMain extends OpMode {
+    public Timer pathTimer;
+    public Timer opmodeTimer;
+    public Follower follower;
     @Override
     public void init() {
-
+        pathTimer = new Timer();
+        opmodeTimer = new Timer();
     }
+
     public void loop() {}
 
     public static Path create(Pose start, Pose end) {
-        return (new AtomicPath(new Line(start, end)).linear(start, end));
+        return line(start, end).linear(start, end);
     }
-
 }
