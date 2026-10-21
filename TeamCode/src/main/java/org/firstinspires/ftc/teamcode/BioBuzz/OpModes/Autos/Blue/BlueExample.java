@@ -12,7 +12,7 @@ public class BlueExample extends BlueMain{
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         follower = ProgramConstants.createFollower(hardwareMap);
-        follower.setPose(start);
+        follower.setPose(pose1);
         follower.update();
         pathGen();
     }

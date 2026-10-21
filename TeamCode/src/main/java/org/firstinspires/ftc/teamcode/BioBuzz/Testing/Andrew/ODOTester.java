@@ -51,7 +51,7 @@ public class ODOTester extends LinearOpMode {
             telemetry.addLine("=== PHYSICAL MANIPULATION TEST ===");
             telemetry.addData("Live X (Inches)", "%.3f", currentX);
             telemetry.addData("Live Y (Inches)", "%.3f", currentY);
-            telemetry.addData("Live Rotation (Degrees)", "%.2f", Math.toDegrees(headingDegrees));
+            telemetry.addData("Live Rotation (Degrees)", "%.2f", headingDegrees);
             telemetry.addLine("---------------------------------");
             telemetry.addLine("=== RAW HARDWARE POD ENCODERS ===");
             telemetry.addData("Raw X Encoder Ticks", rawXTicks);

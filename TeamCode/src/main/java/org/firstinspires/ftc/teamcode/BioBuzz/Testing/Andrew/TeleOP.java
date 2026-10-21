@@ -25,7 +25,7 @@ import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOP", group = "Drive")
 public class TeleOP extends OpMode{
     public TeleOP() {}
-    /*CURRENT CONFIG*/
+    //CURRENT CONFIG
     /*
     * ---Control Hub Params---
     * Motors:
@@ -81,6 +81,7 @@ public class TeleOP extends OpMode{
     public GoBildaPrismDriver LEDStrip;
     public Servo led;
     public DcMotor intakeMotor;
+    public DcMotor intakeMotorTwo;
     public DcMotorEx launcherMotor;
     public CRServo transferServo;
     public DcMotor FrontRight;
@@ -111,8 +112,9 @@ public class TeleOP extends OpMode{
     boolean transferTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 600;
+    public double pollenTargetVelocity = 500;
     public double nectarTargetVelocity = 800;
+    public double velocityStep = 25;//Ticks/sec changed per dpad press
     
     //</editor-fold>
     public void autoTarget() {
@@ -333,14 +335,19 @@ public class TeleOP extends OpMode{
         if(gamepad1.leftTriggerWasPressed()){intakeTrigger = !intakeTrigger;}
         //Toggle transfer servo
         if(gamepad1.aWasPressed()){transferTrigger = !transferTrigger;}
-        if(gamepad1.dpad_down){pollenTargetVelocity--;}
-        if(gamepad1.dpad_up){pollenTargetVelocity++;}
+        //Step once per press, not every loop while held
+        if(gamepad1.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
+        if(gamepad1.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
         if(gamepad1.xWasPressed()){config1 = !config1;}
     }
     public void runMotors(){
         //Apply motor power based on established triggers from inputHandling()
         intakeMotor.setPower(intakeTrigger ? -1 : 0);
-        launcherMotor.setVelocity(launcherTrigger ? pollenTargetVelocity : 0);
+        intakeMotorTwo.setPower(intakeTrigger ? -1 : 0);
+
+        //Velocity control when on, coast down when off instead of braking the flywheel
+        if(launcherTrigger){launcherMotor.setVelocity(pollenTargetVelocity);}
+        else{launcherMotor.setPower(0);}
         transferServo.setPower(transferTrigger ? 1 : 0);
         pollenServo.setPower(transferTrigger ? -1 : 0);
 
@@ -360,7 +367,8 @@ public class TeleOP extends OpMode{
 
         //Extra Motors
         intakeMotor = addMotor(hardwareMap, "intake", true, true);
-        launcherMotor = addMotorEx(hardwareMap, "launcher", true, true, true);
+        intakeMotorTwo= addMotor(hardwareMap, "intakeTwo", true, true);
+        launcherMotor = addMotorEx(hardwareMap, "launcher", true, false, true);//Float so the flywheel coasts
 
         //Init servos
         transferServo = addCRServo(hardwareMap, "transfer", true);

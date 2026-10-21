@@ -13,16 +13,22 @@ public class VariableMain extends AutoMain{
 
     protected static final PoseFactory poseFactory = PoseFactory.degrees();
 
-    protected static final Pose start = poseFactory.of(0, 0, 90);
-    protected static final Pose path1 = poseFactory.of(40, 40, 0);
+    protected static final Pose pose1 = poseFactory.of(0, 0, 90);
+    protected static final Pose pose2 = poseFactory.of(25, 0, 90);
+    protected static final Pose pose3 = poseFactory.of(25, 70, 90);
+    protected static final Pose pose4 = poseFactory.of(0, 70, 90);
 
-    public Path start_to_fire;
+    public Path one_two;
+    public Path two_three;
+    public Path three_four;
+    public Path four_one;
+
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
     public double maxTimeBreakout = 25;
 
     //set up simple states
-    public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END}
+    public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END, ONE, TWO, THREE, FOUR}
     public pathingState pathState = pathingState.START;
 
     //State to return to after moveToPoint case
@@ -32,7 +38,10 @@ public class VariableMain extends AutoMain{
 
 
     public void pathGen(){
-        start_to_fire = create(start, path1);
+        one_two = create(pose1, pose2);
+        two_three = create(pose2, pose3);
+        three_four = create(pose3, pose4);
+        four_one = create(pose4, pose1);
     }
 
     private void movePath(Path path, pathingState state){
@@ -46,7 +55,7 @@ public class VariableMain extends AutoMain{
         opmodeTimer.reset();
         pathTimer.reset();
         pathState = pathingState.START;
-        follower.setPose(start);
+        follower.setPose(pose1);
         pathGen();
     }
 
@@ -55,6 +64,7 @@ public class VariableMain extends AutoMain{
         follower.update();
         telemetry.addData("X", follower.pose().x());
         telemetry.addData("Y", follower.pose().y());
+        telemetry.addData("R", follower.pose().heading());
         telemetry.addData("Current time :", " %.2f", opmodeTimer.milliseconds() / 1000.0);
         telemetry.addData("Current state :", pathState);
         telemetry.update();
@@ -69,8 +79,8 @@ public class VariableMain extends AutoMain{
 
         switch (pathState) {
             case START:
-                //Move to the first spike
-                movePath(start_to_fire, pathingState.PARK);
+                //follower.manual(0, 0, 0.3);
+                pathState = pathingState.ONE;
                 break;
 
             case MOVETOPOINT:
@@ -85,6 +95,24 @@ public class VariableMain extends AutoMain{
                     pathState = returnState;
                 }
                 break;
+
+
+            case ONE:
+                movePath(one_two, pathingState.TWO);
+                break;
+
+            case TWO:
+                movePath(two_three, pathingState.THREE);
+                break;
+
+            case THREE:
+                movePath(three_four, pathingState.FOUR);
+                break;
+
+            case FOUR:
+                movePath(four_one, pathingState.ONE);
+                break;
+
 
             case PARK:
                 if (!(follower.isBusy())) {
