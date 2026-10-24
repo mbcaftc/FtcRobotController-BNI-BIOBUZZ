@@ -29,4 +29,45 @@ public class BlueMain extends MovmentMain {
             movePath(start_to_shoot, pathingState.LOOP);
         }
     }
+    private enum AutoState {
+        START_TO_SHOOT,
+        SHOOTING,
+        SHOOT_TO_PARK,
+        PARKED
+    }
+    private AutoState currentState;
+    @Override
+    public void pathLogic(boolean a) {
+        //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
+
+        if (currentState == null){
+            currentState = AutoState.START_TO_SHOOT;
+        }
+        switch (currentState){
+            case START_TO_SHOOT:
+                if (!follower.isBusy()) {
+                    currentState = AutoState.SHOOTING;
+                }
+                break;
+            case SHOOTING:
+                launch(1000, 1);
+                if (opmodeTimer.seconds() > 10) {
+                    currentState = AutoState.SHOOT_TO_PARK;
+                }
+                break;
+            case SHOOT_TO_PARK:
+                if (!moveToPointChain.equals(shoot_to_park)) {
+                    movePath(shoot_to_park, pathingState.PARK);
+                }
+
+                if (!follower.isBusy()) {
+                    currentState = AutoState.PARKED;
+                }
+                break;
+            case PARKED:
+                break;
+            default:
+                return;
+        }
+    }
 }

@@ -60,6 +60,7 @@ public class MovmentMain extends AutoMain{
 
 
     public void pathLogic(){}//this is being overwritten
+    public void pathLogic(boolean a){}
 
     @Override
     public void loop() {
@@ -99,7 +100,7 @@ public class MovmentMain extends AutoMain{
 
 
             case LOOP:
-                pathLogic();
+                pathLogic(false);
                 break;
 
 
