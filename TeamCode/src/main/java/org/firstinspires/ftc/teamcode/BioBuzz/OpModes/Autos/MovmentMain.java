@@ -1,27 +1,40 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos;
 
 import com.pedropathing.api.PoseFactory;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
-import com.pedropathing.paths.AtomicPath;
 import com.pedropathing.paths.Path;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
-public class VariableMain extends AutoMain{
+public class MovmentMain extends AutoMain{
 
 
     protected static final PoseFactory poseFactory = PoseFactory.degrees();
 
-    protected static final Pose pose1 = poseFactory.of(0, 0, 90);
-    protected static final Pose pose2 = poseFactory.of(25, 0, 90);
-    protected static final Pose pose3 = poseFactory.of(25, 70, 90);
-    protected static final Pose pose4 = poseFactory.of(0, 70, 90);
+    protected static  Pose StartCloseLeft = new Pose(83, 8.8);//1
+    protected static  Pose StartCloseRight = new Pose(106, 8.8);//2
+    protected static  Pose MidUnderHive = new Pose(84, 72);//3
 
-    public Path one_two;
-    public Path two_three;
-    public Path three_four;
-    public Path four_one;
+    protected static  Pose MidAroundCloseHive = new Pose(84, 72);//this is close to flower//4
+    protected static  Pose MidAroundCloseHumans = new Pose (124, 72 );//this is close to humans//5
+    protected static  Pose StartFarLeft = new Pose(83, 132);//6
+    protected static final Pose StartRightRight = new Pose(106, 132);//7
+
+    protected static final Pose ParkPoseA = new Pose(124, 72);//11
+    protected static final Pose ParkPoseB = new Pose(124, 72);//12
+    protected static final Pose LooseBallsPickup =  new Pose(132, 133);//13
+    protected static final Pose Quadrant1Center = new Pose(108, 108);//15
+    protected static final Pose Quadrant3Center = new Pose(72, 36);//16
+    protected static final Pose Quadrant4Center = new Pose(108, 36);//17
+    protected static final Pose FlowerClosePos = new Pose(95, 8.8);//18
+    protected static final Pose FlowerCloseAround = new Pose(95, 18);//19
+    protected static final Pose FlowerFarPos = new Pose(132, 94);//22
+    protected static final Pose FlowerFarAround = new Pose(122, 94);//22
+    protected static final Pose FlowerCloseWest= new Pose(80, 8.8);//18
+    protected static final Pose FlowerCloseEast = new Pose(115, 8.8 );//19
+    protected static final Pose FlowerFarNorth = new Pose(132, 94);//22
+    protected static final Pose FlowerFarSouth = new Pose(122, 94);//22
+
+
+
 
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
@@ -37,14 +50,8 @@ public class VariableMain extends AutoMain{
     public Path moveToPointChain;
 
 
-    public void pathGen(){
-        one_two = create(pose1, pose2);
-        two_three = create(pose2, pose3);
-        three_four = create(pose3, pose4);
-        four_one = create(pose4, pose1);
-    }
 
-    private void movePath(Path path, pathingState state){
+    private void movePath(Path path, MovmentMain.pathingState state){
         moveToPointChain = path;
         returnState = state;
         pathState = pathingState.MOVETOPOINT;
@@ -52,12 +59,9 @@ public class VariableMain extends AutoMain{
 
     @Override
     public void start(){
-        opmodeTimer.reset();
-        pathTimer.reset();
-        pathState = pathingState.START;
-        follower.setPose(pose1);
-        pathGen();
     }
+
+    public void pathLogic(){}//this is being overwritten
 
     @Override
     public void loop() {
@@ -79,7 +83,7 @@ public class VariableMain extends AutoMain{
         switch (pathState) {
             case START:
                 //follower.manual(0, 0, 0.3);
-                movePath(one_two, pathingState.LOOP);
+                //movePath(one_two, pathingState.LOOP);
                 break;
 
             case MOVETOPOINT:
@@ -97,15 +101,7 @@ public class VariableMain extends AutoMain{
 
 
             case LOOP:
-                if (moveToPointChain.equals(one_two)) {
-                    movePath(two_three, pathingState.LOOP);
-                } else if (moveToPointChain.equals(two_three)) {
-                    movePath(three_four, pathingState.LOOP);
-                } else if (moveToPointChain.equals(three_four)) {
-                    movePath(four_one, pathingState.LOOP);
-                } else if (moveToPointChain.equals(four_one)) {
-                    movePath(one_two, pathingState.LOOP);
-                }
+                pathLogic();
                 break;
 
 
