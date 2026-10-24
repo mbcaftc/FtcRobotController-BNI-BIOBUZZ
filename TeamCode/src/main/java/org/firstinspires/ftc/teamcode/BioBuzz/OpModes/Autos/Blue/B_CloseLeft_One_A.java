@@ -1,11 +1,20 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
 
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addCRServo;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotor;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotorEx;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addServo;
+
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoMain;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
@@ -53,10 +62,11 @@ public class B_CloseLeft_One_A extends AutoMain {
     private AutoState currentState = AutoState.START_TO_SHOOT;
 
     private Follower follower;
+
+
     @Override
     public void init(){
         follower = MainConstants.createFollower(hardwareMap);
-
         follower.setPose(new Pose(StartCloseLeft.x(), StartCloseLeft.y(), 90));
         StartToShoot = createLinearPath(StartCloseLeft, Quadrant3Center, 90, 90);
         ShootToPark = createLinearPath(Quadrant3Center, ParkPoseA, 90, 0);
