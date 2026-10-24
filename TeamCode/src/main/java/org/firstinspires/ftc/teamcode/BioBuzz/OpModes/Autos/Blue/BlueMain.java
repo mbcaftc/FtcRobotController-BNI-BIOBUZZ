@@ -6,11 +6,27 @@ import com.pedropathing.paths.Path;
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 
 public class BlueMain extends MovmentMain {
+    public Pose startPose;
+    public Pose shootPose;
+    public Pose parkPose;
 
+    public Path start_to_shoot;
+    public Path shoot_to_park;
 
+    public void buildPaths(){
+        start_to_shoot = createLinearPath(startPose, shootPose, 90, 90);
+        shoot_to_park = createLinearPath(shootPose, parkPose, 90, 90);
+    }
 
     @Override
     public void pathLogic(){
-
+        //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
+        if (moveToPointChain.equals(start_to_shoot)) {
+            movePath(shoot_to_park, pathingState.PARK);
+        }
+        else{
+            //If there is not path assigned to moveToPointChain, assign it the first path of start_to_shoot
+            movePath(start_to_shoot, pathingState.LOOP);
+        }
     }
 }

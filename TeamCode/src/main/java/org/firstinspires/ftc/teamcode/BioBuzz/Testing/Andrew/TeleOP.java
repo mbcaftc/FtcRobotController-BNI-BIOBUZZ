@@ -347,8 +347,9 @@ public class TeleOP extends OpMode{
     }
     public void runMotors(){
         //Apply motor power based on established triggers from inputHandling()
-        intakeMotor.setPower(intakeTrigger ? -1 : 0);
-        intakeMotorTwo.setPower(intakeTrigger ? -1 : 0);
+        int intakeDirection = gamepad2.left_bumper ? 1 : -1;
+        intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
+        intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
 
         //Velocity control when on, coast down when off instead of braking the flywheel
         if(launcherTrigger){launcherMotor.setVelocity(pollenTargetVelocity);}
@@ -361,7 +362,7 @@ public class TeleOP extends OpMode{
         turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
 
         //Moves the flower axon servo to an up position of 0, and down position of .4.
-        flowerAxon.setPosition(flowerAxonTrigger ? 0 : .5);
+        flowerAxon.setPosition(flowerAxonTrigger ? 0 : .4385);
     }
     @Override
     public void init() {

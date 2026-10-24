@@ -5,21 +5,18 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Blue_CloseLeft_One_A", group = "Drive")
 public class Blue_CloseLeft_One_A extends BlueMain{
-    Path StartToShoot;
-    Path ShootToPark;
-    public void pathGen(){
-        StartToShoot = createLinearPath(StartCloseLeft, Quadrant3Center, 90, 90);
-    }
     @Override
     public void init(){
+        //AutoMain init
         setup();
+        //Set BlueMain points (BEFORE buildPaths())
+        startPose = StartCloseLeft;
+        shootPose = Quadrant3Center;
+        parkPose = ParkPoseB;
+        //BlueMain init
+        buildPaths();
+        //Start the follower
         follower.setPose(StartCloseLeft);
         follower.update();
-
-    }
-
-    @Override
-    public void loop(){
-
     }
 }

@@ -51,15 +51,13 @@ public class MovmentMain extends AutoMain{
 
 
 
-    private void movePath(Path path, MovmentMain.pathingState state){
+    public void movePath(Path path, MovmentMain.pathingState state){
         moveToPointChain = path;
         returnState = state;
         pathState = pathingState.MOVETOPOINT;
     }
 
-    @Override
-    public void start(){
-    }
+
 
     public void pathLogic(){}//this is being overwritten
 
@@ -82,8 +80,7 @@ public class MovmentMain extends AutoMain{
 
         switch (pathState) {
             case START:
-                //follower.manual(0, 0, 0.3);
-                //movePath(one_two, pathingState.LOOP);
+                pathState = pathingState.LOOP;
                 break;
 
             case MOVETOPOINT:
@@ -110,12 +107,11 @@ public class MovmentMain extends AutoMain{
                     pathState = pathingState.END;
                 }
                 break;
+
             case END:
                 break;
         }
+
         telemetry.update();
-
     }
-
-
 }
