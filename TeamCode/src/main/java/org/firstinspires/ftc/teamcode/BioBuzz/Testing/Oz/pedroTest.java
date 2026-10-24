@@ -6,6 +6,7 @@ import com.pedropathing.utils.Timer;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.ProgramConstants;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class pedroTest extends PoseMain {
     @Override
     public void init() {
         runTimer = new Timer();
-        follower = ProgramConstants.createFollower(hardwareMap);
+        follower = MainConstants.createFollower(hardwareMap);
         follower.setPose(start);
         paths.clear();
         for (Object[] definition : PathState.pathDefinitions()) {

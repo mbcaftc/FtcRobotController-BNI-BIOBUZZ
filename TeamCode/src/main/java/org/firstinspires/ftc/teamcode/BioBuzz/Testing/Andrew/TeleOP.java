@@ -84,6 +84,8 @@ public class TeleOP extends OpMode{
     public DcMotor intakeMotorTwo;
     public DcMotorEx launcherMotor;
     public CRServo transferServo;
+    public CRServo spinNoBackServo;
+    public Servo flowerAxon;
     public DcMotor FrontRight;
     public DcMotor FrontLeft;
     public DcMotor BackRight;
@@ -110,6 +112,7 @@ public class TeleOP extends OpMode{
     boolean launcherTrigger = false;
     boolean intakeTrigger = false;
     boolean transferTrigger = false;
+    boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
     public double pollenTargetVelocity = 500;
@@ -222,7 +225,7 @@ public class TeleOP extends OpMode{
                 double speedMultiply = .75;
                 if (avgX < -autoVariation) {
                     //Turn Left
-                    autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
+                    autoSpeed = .5 * (Math.abs(avgX) - autoVariation) + .5;
                     turretServo.setPower(autoSpeed);
                     /*
                     setMotorPower(FrontLeft, autoSpeed, powerThreshold, speedMultiply);
@@ -339,6 +342,8 @@ public class TeleOP extends OpMode{
         if(gamepad1.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
         if(gamepad1.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
         if(gamepad1.xWasPressed()){config1 = !config1;}
+
+        if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
     }
     public void runMotors(){
         //Apply motor power based on established triggers from inputHandling()
@@ -350,9 +355,13 @@ public class TeleOP extends OpMode{
         else{launcherMotor.setPower(0);}
         transferServo.setPower(transferTrigger ? 1 : 0);
         pollenServo.setPower(transferTrigger ? -1 : 0);
+        spinNoBackServo.setPower(transferTrigger ? -1 : 0);
 
         //Move the transfer servo with += .1 deadzone
         turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
+
+        //Moves the flower axon servo to an up position of 0, and down position of .4.
+        flowerAxon.setPosition(flowerAxonTrigger ? 0 : .5);
     }
     @Override
     public void init() {
@@ -374,6 +383,8 @@ public class TeleOP extends OpMode{
         transferServo = addCRServo(hardwareMap, "transfer", true);
         turretServo = addCRServo(hardwareMap, "turret", true);
         pollenServo = addCRServo(hardwareMap, "pollen", true);
+        spinNoBackServo = addCRServo(hardwareMap, "spinNoBack", true);
+        flowerAxon = addServo(hardwareMap, "flowerAxon", true);
 
 
         //Analogue Input

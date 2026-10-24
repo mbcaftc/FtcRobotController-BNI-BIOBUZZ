@@ -25,6 +25,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.ProgramConstants;
 
 public class AutoMain extends OpMode {
     public Timer pathTimer;
@@ -32,8 +34,12 @@ public class AutoMain extends OpMode {
     public Follower follower;
     @Override
     public void init() {
+        setup();
+    }
+    public void setup(){
         pathTimer = new Timer();
         opmodeTimer = new Timer();
+        follower = MainConstants.createFollower(hardwareMap);
     }
 
     public void loop() {}
@@ -41,4 +47,6 @@ public class AutoMain extends OpMode {
     public static Path create(Pose start, Pose end) {
         return line(start, end).linear(start, end);
     }
+
+
 }

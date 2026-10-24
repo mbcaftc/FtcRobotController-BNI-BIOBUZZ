@@ -28,7 +28,7 @@ public class VariableMain extends AutoMain{
     public double maxTimeBreakout = 25;
 
     //set up simple states
-    public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END, ONE, TWO, THREE, FOUR}
+    public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END, LOOP}
     public pathingState pathState = pathingState.START;
 
     //State to return to after moveToPoint case
@@ -67,7 +67,6 @@ public class VariableMain extends AutoMain{
         telemetry.addData("R", follower.pose().heading());
         telemetry.addData("Current time :", " %.2f", opmodeTimer.milliseconds() / 1000.0);
         telemetry.addData("Current state :", pathState);
-        telemetry.update();
 
         //Max time breakout
         if(opmodeTimer.seconds() > maxTimeBreakout){
@@ -80,7 +79,7 @@ public class VariableMain extends AutoMain{
         switch (pathState) {
             case START:
                 //follower.manual(0, 0, 0.3);
-                pathState = pathingState.ONE;
+                movePath(one_two, pathingState.LOOP);
                 break;
 
             case MOVETOPOINT:
@@ -97,20 +96,16 @@ public class VariableMain extends AutoMain{
                 break;
 
 
-            case ONE:
-                movePath(one_two, pathingState.TWO);
-                break;
-
-            case TWO:
-                movePath(two_three, pathingState.THREE);
-                break;
-
-            case THREE:
-                movePath(three_four, pathingState.FOUR);
-                break;
-
-            case FOUR:
-                movePath(four_one, pathingState.ONE);
+            case LOOP:
+                if (moveToPointChain.equals(one_two)) {
+                    movePath(two_three, pathingState.LOOP);
+                } else if (moveToPointChain.equals(two_three)) {
+                    movePath(three_four, pathingState.LOOP);
+                } else if (moveToPointChain.equals(three_four)) {
+                    movePath(four_one, pathingState.LOOP);
+                } else if (moveToPointChain.equals(four_one)) {
+                    movePath(one_two, pathingState.LOOP);
+                }
                 break;
 
 
@@ -122,6 +117,8 @@ public class VariableMain extends AutoMain{
             case END:
                 break;
         }
+        telemetry.update();
+
     }
 
 

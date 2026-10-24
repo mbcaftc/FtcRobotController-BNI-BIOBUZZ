@@ -9,9 +9,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.pedro.ProgramConstants;
 public class BlueExample extends BlueMain{
     @Override
     public void init(){
-        pathTimer = new Timer();
-        opmodeTimer = new Timer();
-        follower = ProgramConstants.createFollower(hardwareMap);
+        setup();
         follower.setPose(pose1);
         follower.update();
         pathGen();
