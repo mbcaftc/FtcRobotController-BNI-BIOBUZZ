@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
 
+import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -16,7 +17,7 @@ public class Blue_CloseLeft_One_A extends BlueMain{
         //BlueMain init
         buildPaths();
         //Start the follower
-        follower.setPose(StartCloseLeft);
+        follower.setPose(new Pose(startPose.x(), startPose.y(), 90));
         follower.update();
     }
 }
