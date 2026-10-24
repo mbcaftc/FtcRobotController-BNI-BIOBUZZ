@@ -115,8 +115,8 @@ public class TeleOP extends OpMode{
     boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 500;
-    public double nectarTargetVelocity = 800;
+    public double pollenTargetVelocity = 1100;
+    public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
     
     //</editor-fold>
@@ -333,11 +333,11 @@ public class TeleOP extends OpMode{
     }
     public void inputHandling(){
         //Toggle launcher
-        if(gamepad1.rightTriggerWasPressed()){launcherTrigger = !launcherTrigger;}
+        if(gamepad2.rightTriggerWasPressed()){launcherTrigger = !launcherTrigger;}
         //Toggle intake
         if(gamepad1.leftTriggerWasPressed()){intakeTrigger = !intakeTrigger;}
         //Toggle transfer servo
-        if(gamepad1.aWasPressed()){transferTrigger = !transferTrigger;}
+        if(gamepad2.aWasPressed()){transferTrigger = !transferTrigger;}
         //Step once per press, not every loop while held
         if(gamepad1.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
         if(gamepad1.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
@@ -347,7 +347,7 @@ public class TeleOP extends OpMode{
     }
     public void runMotors(){
         //Apply motor power based on established triggers from inputHandling()
-        int intakeDirection = gamepad2.left_bumper ? 1 : -1;
+        int intakeDirection = gamepad1.left_bumper ? 1 : -1;
         intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
         intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
 
@@ -362,7 +362,7 @@ public class TeleOP extends OpMode{
         turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
 
         //Moves the flower axon servo to an up position of 0, and down position of .4.
-        flowerAxon.setPosition(flowerAxonTrigger ? 0 : .4385);
+        flowerAxon.setPosition(flowerAxonTrigger ? .385 : 0);
     }
     @Override
     public void init() {

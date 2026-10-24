@@ -100,7 +100,7 @@ public class MovmentMain extends AutoMain{
 
 
             case LOOP:
-                pathLogic(false);
+                pathLogic();
                 break;
 
 

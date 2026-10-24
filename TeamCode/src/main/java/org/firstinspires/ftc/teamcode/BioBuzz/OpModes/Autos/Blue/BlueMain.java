@@ -22,7 +22,10 @@ public class BlueMain extends MovmentMain {
     public void pathLogic(){
         //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
         if (moveToPointChain.equals(start_to_shoot)) {
-            movePath(shoot_to_park, pathingState.PARK);
+            launch(1000, 1);
+            if (opmodeTimer.seconds() > 10) {
+                movePath(shoot_to_park, pathingState.PARK);
+            }
         }
         else{
             //If there is not path assigned to moveToPointChain, assign it the first path of start_to_shoot
@@ -45,9 +48,9 @@ public class BlueMain extends MovmentMain {
         }
         switch (currentState){
             case START_TO_SHOOT:
-                if (!follower.isBusy()) {
-                    currentState = AutoState.SHOOTING;
-                }
+                //Move initial path
+                movePath(start_to_shoot, pathingState.LOOP);
+                currentState = AutoState.SHOOTING;
                 break;
             case SHOOTING:
                 launch(1000, 1);
@@ -59,15 +62,14 @@ public class BlueMain extends MovmentMain {
                 if (!moveToPointChain.equals(shoot_to_park)) {
                     movePath(shoot_to_park, pathingState.PARK);
                 }
-
-                if (!follower.isBusy()) {
+                else{
                     currentState = AutoState.PARKED;
                 }
                 break;
             case PARKED:
                 break;
             default:
-                return;
+                break;
         }
     }
 }
