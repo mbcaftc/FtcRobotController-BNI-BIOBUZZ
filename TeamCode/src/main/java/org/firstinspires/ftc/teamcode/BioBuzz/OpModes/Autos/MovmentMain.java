@@ -81,6 +81,7 @@ public class MovmentMain extends AutoMain{
         switch (pathState) {
             case START:
                 pathState = pathingState.LOOP;
+                moveToPointChain = createLinearPath(new Pose(0, 0), new Pose(1, 0), 0, 0);
                 break;
 
             case MOVETOPOINT:
