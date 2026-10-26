@@ -4,13 +4,14 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Oz;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addOdometry;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
+@Disabled
 @TeleOp(name = "Oz Start Bot", group = "Drive")
 public class StartBot extends FunctionMain {
     private static final double maxSpeed = 1.00;

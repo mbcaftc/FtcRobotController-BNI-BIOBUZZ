@@ -5,6 +5,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.utils.Timer;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.ProgramConstants;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.EnumMap;
 import java.util.Map;
 
-
+@Disabled
 @Autonomous(name = "Pedro test oz v1", group = "Drive")
 public class pedroTest extends PoseMain {
 
