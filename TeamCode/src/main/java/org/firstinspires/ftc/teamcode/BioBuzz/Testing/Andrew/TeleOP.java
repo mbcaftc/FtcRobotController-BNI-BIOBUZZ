@@ -118,6 +118,7 @@ public class TeleOP extends OpMode{
     public double pollenTargetVelocity = 1100;
     public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
+    public double axonIncrementAmount = 0;
     
     //</editor-fold>
     public void autoTarget() {
@@ -164,6 +165,13 @@ public class TeleOP extends OpMode{
                     RFavgY += fr.getTargetYDegrees();
                     RFang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
                     RFYoffset += targetPose.getPosition().y;
+                }
+                if (fr.getFiducialId() >= 21 || fr.getFiducialId() <= 23) {
+                    RFTags = 1;
+                    RFavgX = fr.getTargetXDegrees();
+                    RFavgY = fr.getTargetYDegrees();
+                    RFang = targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                    RFYoffset = targetPose.getPosition().y;
                 }
                 //BlueFront Cluster
                 if (fr.getFiducialId() >= 38 && fr.getFiducialId() <= 41) {
@@ -219,31 +227,26 @@ public class TeleOP extends OpMode{
 
 
                 //Set the target hive as the higher (lesser y offset) of the 2 or the one seen
-                double avgX = front ? RFavgX : RBavgX;
+                double avgAng = front ? RFang : RBang;
 
                 //Move according to midpoint of hive
-                double speedMultiply = .75;
-                if (avgX < -autoVariation) {
-                    //Turn Left
-                    autoSpeed = .5 * (Math.abs(avgX) - autoVariation) + .5;
-                    turretServo.setPower(autoSpeed);
-                    /*
-                    setMotorPower(FrontLeft, autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(FrontRight, -autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(BackLeft, autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(BackRight, -autoSpeed, powerThreshold, speedMultiply);*/
-                    LEDCon(led, 6);
-                } else if (avgX > autoVariation) {
-                    //Turn Right
-                    autoSpeed = .039 * (Math.abs(avgX) - autoVariation) + .1;
-                    turretServo.setPower(-autoSpeed);
-                    /*
-                    setMotorPower(FrontLeft, -autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(FrontRight, autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(BackLeft, -autoSpeed, powerThreshold, speedMultiply);
-                    setMotorPower(BackRight, autoSpeed, powerThreshold, speedMultiply);*/
-                    LEDCon(led, 6);
+                if (Math.abs(avgAng) > autoVariation) {
+                    // Determine direction (+1 for left, -1 for right)
+                    double direction = Math.signum(avgAng);
+
+                    if (Math.abs(avgAng) > 6.0) {
+                        // STAGE 1: Big error (> 6 degrees). High, controlled speed to close the distance.
+                        axonIncrementAmount = direction * 0.35;
+                        LEDCon(led, 6);
+                    } else {
+                        // STAGE 2: Small error (< 6 degrees). Absolute crawl speed to prevent overshooting the center.
+                        // 0.12 is just enough power to overcome friction without building heavy momentum.
+                        axonIncrementAmount = direction * 0.12;
+                        LEDCon(led, 5); // Changed to an intermediate LED state to visually debug the crawl zone
+                    }
                 } else {
+                    // STAGE 3: Dead stop inside target window
+                    axonIncrementAmount = 0.0;
                     LEDCon(led, 4);
                 }
             }
@@ -354,12 +357,15 @@ public class TeleOP extends OpMode{
         //Velocity control when on, coast down when off instead of braking the flywheel
         if(launcherTrigger){launcherMotor.setVelocity(pollenTargetVelocity);}
         else{launcherMotor.setPower(0);}
+
         transferServo.setPower(transferTrigger ? 1 : 0);
         pollenServo.setPower(transferTrigger ? -1 : 0);
         spinNoBackServo.setPower(transferTrigger ? -1 : 0);
 
         //Move the transfer servo with += .1 deadzone
-        turretServo.setPower(Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0);
+        turretServo.setPower(axonIncrementAmount == 0.0 ? ((gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount);
+        axonIncrementAmount = 0.0;
+
 
         //Moves the flower axon servo to an up position of 0, and down position of .4.
         flowerAxon.setPosition(flowerAxonTrigger ? .385 : 0);
