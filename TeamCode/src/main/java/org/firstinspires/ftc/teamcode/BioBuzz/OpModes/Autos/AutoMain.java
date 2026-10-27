@@ -45,16 +45,13 @@ public class AutoMain extends OpMode {
         spinNoBackServo = addCRServo(hardwareMap, "spinNoBack", true);
         flowerAxon = addServo(hardwareMap, "flowerAxon", true);
     }
-    @Override
-    public void init() {
-        initHardWare();
-        setup();
-    }
     public void setup(){
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         follower = MainConstants.createFollower(hardwareMap);
     }
+
+public void init(){}//do not add anything needed for opmode to compile
 
     public void loop() {}
 
