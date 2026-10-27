@@ -74,6 +74,8 @@ public class TeleOP extends OpMode{
     double pastAxonPosition = 0;
     double totalAxonTravel = 0;
     double turretCurrentHeading = 0;
+
+
     //</editor-fold>
     //<editor-fold desc="Component Initializations">
     public IMU imu = null;
@@ -123,7 +125,7 @@ public class TeleOP extends OpMode{
     //</editor-fold>
     public void autoTarget() {
         result = limelight.getLatestResult();
-        if (gamepad1.b) {
+
             double RFavgX = 0;
             double RFavgY = 0;
             double RFang = 0;
@@ -205,6 +207,7 @@ public class TeleOP extends OpMode{
             BBavgX /= BBTags;
             BBavgY /= BBTags;
 
+        if (gamepad2.y) {
             //Check if any tags are being seen
             if(RFTags > 0 || RBTags > 0) {
                 //Take the lower of the 2 y values as the higher hive
@@ -227,7 +230,7 @@ public class TeleOP extends OpMode{
 
 
                 //Set the target hive as the higher (lesser y offset) of the 2 or the one seen
-                double avgAng = front ? RFang : RBang;
+                double avgAng = front ? RFavgX : RBavgX;
 
                 //Move according to midpoint of hive
                 if (Math.abs(avgAng) > autoVariation) {
@@ -236,12 +239,12 @@ public class TeleOP extends OpMode{
 
                     if (Math.abs(avgAng) > 6.0) {
                         // STAGE 1: Big error (> 6 degrees). High, controlled speed to close the distance.
-                        axonIncrementAmount = direction * 0.35;
+                        axonIncrementAmount = direction * 0.1;
                         LEDCon(led, 6);
                     } else {
                         // STAGE 2: Small error (< 6 degrees). Absolute crawl speed to prevent overshooting the center.
                         // 0.12 is just enough power to overcome friction without building heavy momentum.
-                        axonIncrementAmount = direction * 0.12;
+                        axonIncrementAmount = direction * 0.05;
                         LEDCon(led, 5); // Changed to an intermediate LED state to visually debug the crawl zone
                     }
                 } else {
@@ -314,6 +317,7 @@ public class TeleOP extends OpMode{
         telemetry.addData("Pollen Target Velocity", pollenTargetVelocity);
         telemetry.addData("Axon Position: %.2f Degrees", turretCurrentHeading);
         telemetry.addData("Using Default config: ", config1);
+        telemetry.addData("Axon Increment: ", axonIncrementAmount);
         telemetry.update();
     }
     public void calcTurretPos(){
@@ -342,8 +346,8 @@ public class TeleOP extends OpMode{
         //Toggle transfer servo
         if(gamepad2.aWasPressed()){transferTrigger = !transferTrigger;}
         //Step once per press, not every loop while held
-        if(gamepad1.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
-        if(gamepad1.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
+        if(gamepad2.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
+        if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
         if(gamepad1.xWasPressed()){config1 = !config1;}
 
         if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
@@ -363,12 +367,12 @@ public class TeleOP extends OpMode{
         spinNoBackServo.setPower(transferTrigger ? -1 : 0);
 
         //Move the transfer servo with += .1 deadzone
-        turretServo.setPower(axonIncrementAmount == 0.0 ? ((gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount);
+        turretServo.setPower(axonIncrementAmount == 0.0 ? (Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount);
         axonIncrementAmount = 0.0;
 
 
         //Moves the flower axon servo to an up position of 0, and down position of .4.
-        flowerAxon.setPosition(flowerAxonTrigger ? .385 : 0);
+        flowerAxon.setPosition(flowerAxonTrigger ? .41 : 0);
     }
     @Override
     public void init() {
