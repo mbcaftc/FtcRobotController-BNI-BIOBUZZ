@@ -22,14 +22,17 @@ public class BlueMain extends MovmentMain {
     public void pathLogic(){
         //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
         if (moveToPointChain.equals(start_to_shoot)) {
-            launch(1000, 1);
+            launch(1050, 1);
             if (opmodeTimer.seconds() > 10) {
+                cutPower();
                 movePath(shoot_to_park, pathingState.PARK);
             }
         }
         else{
-            //If there is not path assigned to moveToPointChain, assign it the first path of start_to_shoot
+            //If there is not a path assigned to moveToPointChain, assign it the first path of start_to_shoot
             movePath(start_to_shoot, pathingState.LOOP);
+            //Spin up launcher early
+            launcherMotor.setVelocity(1100);
         }
     }
     private enum AutoState {

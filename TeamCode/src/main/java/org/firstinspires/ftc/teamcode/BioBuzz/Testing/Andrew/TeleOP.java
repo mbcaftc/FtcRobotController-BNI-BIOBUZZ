@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.Color;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations;
 
@@ -64,16 +65,25 @@ public class TeleOP extends OpMode{
     * Limelight - LL
     *
     * */
+
+    //<editor-fold desc="Environment Vars">
+    public boolean blueTeam = true;
+    //</editor-fold>
     //<editor-fold desc="AutoTargeting Variables">
     //Limelight Cam data
     protected LLResult result;
     //Auto Correct X Variation
-    double autoVariation = 1;
+    double autoVariation = 2;
     //Autocorrect rotation speed
     double autoSpeed = .5;
     double pastAxonPosition = 0;
     double totalAxonTravel = 0;
     double turretCurrentHeading = 0;
+
+    double kP = 0.0055;          // power per degree of error
+    double kStatic = 0.05;      // minimum power that actually moves the turret
+    double maxTurretPower = 0.35;
+    double turretDirection = -1; // flip to -1 if it turns away from the tag
 
 
     //</editor-fold>
@@ -168,7 +178,7 @@ public class TeleOP extends OpMode{
                     RFang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
                     RFYoffset += targetPose.getPosition().y;
                 }
-                if (fr.getFiducialId() >= 21 || fr.getFiducialId() <= 23) {
+                if (fr.getFiducialId() >= 21 && fr.getFiducialId() <= 23) {
                     RFTags = 1;
                     RFavgX = fr.getTargetXDegrees();
                     RFavgY = fr.getTargetYDegrees();
@@ -232,26 +242,27 @@ public class TeleOP extends OpMode{
                 //Set the target hive as the higher (lesser y offset) of the 2 or the one seen
                 double avgAng = front ? RFavgX : RBavgX;
 
+                telemetry.addData("Avg Ang: ", avgAng);
+
                 //Move according to midpoint of hive
                 if (Math.abs(avgAng) > autoVariation) {
-                    // Determine direction (+1 for left, -1 for right)
-                    double direction = Math.signum(avgAng);
+                    // Power scales with error
+                    double power = kP * avgAng;
 
-                    if (Math.abs(avgAng) > 6.0) {
-                        // STAGE 1: Big error (> 6 degrees). High, controlled speed to close the distance.
-                        axonIncrementAmount = direction * 0.1;
-                        LEDCon(led, 6);
-                    } else {
-                        // STAGE 2: Small error (< 6 degrees). Absolute crawl speed to prevent overshooting the center.
-                        // 0.12 is just enough power to overcome friction without building heavy momentum.
-                        axonIncrementAmount = direction * 0.05;
-                        LEDCon(led, 5); // Changed to an intermediate LED state to visually debug the crawl zone
-                    }
+                    // Add enough power to overcome friction so it doesn't stall near the target
+                    power += Math.signum(avgAng) * kStatic;
+
+                    // Cap the speed so it can't build up too much momentum
+                    power = Range.clip(power, -maxTurretPower, maxTurretPower);
+
+                    axonIncrementAmount = turretDirection * power;
+                    LEDCon(led, Math.abs(avgAng) > 6.0 ? 6 : 5);
                 } else {
-                    // STAGE 3: Dead stop inside target window
+                    // Inside target window
                     axonIncrementAmount = 0.0;
                     LEDCon(led, 4);
                 }
+                telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
             }
         }
     }
@@ -350,6 +361,12 @@ public class TeleOP extends OpMode{
         if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
         if(gamepad1.xWasPressed()){config1 = !config1;}
 
+        if(gamepad1.dpadUpWasPressed()){
+            blueTeam = !blueTeam;
+            //Switch LED strip color based on blueteam var
+            LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(blueTeam ? Color.BLUE : Color.RED));
+        }
+
         if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
     }
     public void runMotors(){
@@ -407,7 +424,7 @@ public class TeleOP extends OpMode{
         //Init LEDs
         led = addServo(hardwareMap, "LED", true);
         LEDStrip = hardwareMap.get(GoBildaPrismDriver.class, "PRISM");
-        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.SineWave());
+        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(blueTeam ? Color.BLUE : Color.RED));
 
         //Init the limelight camera for April Tag detection
         limelight = addLimelight(hardwareMap, "LL");
@@ -438,14 +455,15 @@ public class TeleOP extends OpMode{
         //Control the input triggers
         inputHandling();
 
+
+        //Limelight and targeting
+        autoTarget();
+
         //Update the turret position
         calcTurretPos();
 
         //Drive all the motors based on triggers
         runMotors();
-
-        //Limelight and targeting
-        autoTarget();
 
         //Telemetry
         runTelemetry();

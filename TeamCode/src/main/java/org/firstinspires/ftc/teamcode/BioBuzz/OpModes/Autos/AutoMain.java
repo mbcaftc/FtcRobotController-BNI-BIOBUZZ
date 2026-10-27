@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 public class AutoMain extends OpMode {
     public Timer pathTimer;
     public Timer opmodeTimer;
+    public Timer shotTimer;
     public Follower follower;
 
     public DcMotor intakeMotor;
@@ -48,6 +49,7 @@ public class AutoMain extends OpMode {
     public void setup(){
         pathTimer = new Timer();
         opmodeTimer = new Timer();
+        shotTimer = new Timer();
         follower = MainConstants.createFollower(hardwareMap);
     }
 
@@ -62,9 +64,36 @@ public void init(){}//do not add anything needed for opmode to compile
     }
     public void launch(double laucnhSpeed, double servoPower){
         launcherMotor.setVelocity(laucnhSpeed);
-        transferServo.setPower(servoPower);
-        pollenServo.setPower(-servoPower);
-        spinNoBackServo.setPower(-servoPower);
+        //Launch if in gate and if current integer shot length is even, making sure that it doesnt fire too quickly
+        if(launcherMotor.getVelocity() > laucnhSpeed - 25) {
+            if(((int) shotTimer.seconds() * 9) % 2 == 0) {
+                transferServo.setPower(servoPower);
+                pollenServo.setPower(-servoPower);
+                spinNoBackServo.setPower(-servoPower);
+                intakeMotor.setPower(-1);
+                intakeMotorTwo.setPower(-1);
+            }
+            else{
+                transferServo.setPower(0);
+                pollenServo.setPower(0);
+            }
+        }
+        else{
+            shotTimer.reset();
+            transferServo.setPower(0);
+            pollenServo.setPower(0);
+            spinNoBackServo.setPower(0);
+            intakeMotor.setPower(0);
+            intakeMotorTwo.setPower(0);
+        }
+    }
+    public void cutPower(){
+        transferServo.setPower(0);
+        pollenServo.setPower(0);
+        spinNoBackServo.setPower(0);
+        intakeMotor.setPower(0);
+        intakeMotorTwo.setPower(0);
+        launcherMotor.setVelocity(0);
     }
 
 

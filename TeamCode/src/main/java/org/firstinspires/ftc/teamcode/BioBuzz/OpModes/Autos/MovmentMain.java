@@ -9,7 +9,7 @@ public class MovmentMain extends AutoMain{
 
     protected static final PoseFactory poseFactory = PoseFactory.degrees();
 
-    protected static  Pose StartCloseLeft = new Pose(83, 8.8);//1
+    protected static  Pose StartCloseLeft = new Pose(72, 8.8);//1
     protected static  Pose StartCloseRight = new Pose(106, 8.8);//2
     protected static  Pose MidUnderHive = new Pose(84, 72);//3
 
@@ -19,10 +19,12 @@ public class MovmentMain extends AutoMain{
     protected static final Pose StartRightRight = new Pose(106, 132);//7
 
     protected static final Pose ParkPoseA = new Pose(124, 72);//11
-    protected static final Pose ParkPoseB = new Pose(124, 72);//12
+    protected static final Pose ParkPoseB = new Pose(100, 65);//12
     protected static final Pose LooseBallsPickup =  new Pose(132, 133);//13
     protected static final Pose Quadrant1Center = new Pose(108, 108);//15
+    protected static final Pose Quadrant2Center = new Pose(72, 108);//14
     protected static final Pose Quadrant3Center = new Pose(72, 36);//16
+    protected static final Pose Quadrant3Back = new Pose(72, 16);//
     protected static final Pose Quadrant4Center = new Pose(108, 36);//17
     protected static final Pose FlowerClosePos = new Pose(95, 8.8);//18
     protected static final Pose FlowerCloseAround = new Pose(95, 18);//19
