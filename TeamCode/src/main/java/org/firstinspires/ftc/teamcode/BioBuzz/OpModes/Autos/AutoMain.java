@@ -55,11 +55,20 @@ public class AutoMain extends OpMode {
 
 public void init(){}//do not add anything needed for opmode to compile
 
+    //Reset timers when start is pressed so time spent in init doesn't count
+    @Override
+    public void start(){
+        pathTimer.reset();
+        opmodeTimer.reset();
+        shotTimer.reset();
+    }
+
     public void loop() {}
 
+    //Headings are in degrees, Pedro uses radians
     public static Path createLinearPath(Pose start, Pose end, double headingStart, double headingEnd) {
-        Pose a = new Pose(start.x(), start.y(), headingStart);
-        Pose b = new Pose(end.x(), end.y(), headingEnd);
+        Pose a = new Pose(start.x(), start.y(), Math.toRadians(headingStart));
+        Pose b = new Pose(end.x(), end.y(), Math.toRadians(headingEnd));
         return line(a, b).linear(a, b);
     }
     public void launch(double laucnhSpeed, double servoPower){

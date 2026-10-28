@@ -18,7 +18,7 @@ public class BlueStartFar2Nav extends FarHiveTip{
         //BlueMain init
         buildPaths();
         //Start the follower
-        follower.setPose(new Pose(startPose.x(), startPose.y(), 270));
+        follower.setPose(new Pose(startPose.x(), startPose.y(), Math.toRadians(270)));
         follower.update();
     }
 }

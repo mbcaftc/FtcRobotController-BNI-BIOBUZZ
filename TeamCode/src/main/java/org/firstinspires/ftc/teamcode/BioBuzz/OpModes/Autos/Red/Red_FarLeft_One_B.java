@@ -50,7 +50,7 @@ public class Red_FarLeft_One_B extends MovmentMain {
         //BlueMain init
         buildPaths();
         //Start the follower
-        follower.setPose(new Pose(startPose.x(), startPose.y(), 90));
+        follower.setPose(new Pose(startPose.x(), startPose.y(), Math.toRadians(90)));
         follower.update();
     }
 }
