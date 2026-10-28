@@ -34,6 +34,7 @@ public class Red_FarLeft_One_B extends MovmentMain {
             //If there is not path assigned to moveToPointChain, assign it the first path of start_to_shoot
             movePath(transit_to_park, pathingState.PARK);
         }else{
+            ;
 //            //If there is not path assigned to moveToPointChain, assign it the first path of start_to_shoot
 //            movePath(start_to_shoot, MovmentMain.pathingState.LOOP);
         }
