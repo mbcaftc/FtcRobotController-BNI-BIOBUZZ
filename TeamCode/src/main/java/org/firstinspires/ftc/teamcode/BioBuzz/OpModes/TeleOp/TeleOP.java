@@ -240,7 +240,8 @@ public class TeleOP extends OpMode{
 
 
                 //Set the target hive as the higher (lesser y offset) of the 2 or the one seen
-                double avgAng = front ? RFavgX : RBavgX;
+                double avgAng = front ? RFavgX : RBavgX; //Uncomment for Red
+                //double avgAng = front ? BFavgX : BBavgX; //Uncomment for Blue
 
                 telemetry.addData("Avg Ang: ", avgAng);
 
