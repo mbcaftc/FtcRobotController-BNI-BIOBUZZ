@@ -9,6 +9,6 @@ import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.BlueMain;
 public class launchAuthoTest extends BlueMain {
     @Override
     public void loop(){
-        launch(1000, 1);
+        launch(1050, 1350, 3, 1);
     }
 }

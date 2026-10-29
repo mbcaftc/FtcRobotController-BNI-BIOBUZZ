@@ -22,7 +22,7 @@ public class BlueMain extends MovmentMain {
     public void pathLogic(){
         //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
         if (moveToPointChain.equals(start_to_shoot)) {
-            launch(1050, 1);
+            launch(1050, 1500, 3, 1);
             if (opmodeTimer.seconds() > 10) {
                 cutPower();
                 movePath(shoot_to_park, pathingState.PARK);
@@ -56,7 +56,7 @@ public class BlueMain extends MovmentMain {
                 currentState = AutoState.SHOOTING;
                 break;
             case SHOOTING:
-                launch(1000, 1);
+                launch(1050, 1500, 3, 1);
                 if (opmodeTimer.seconds() > 10) {
                     currentState = AutoState.SHOOT_TO_PARK;
                 }

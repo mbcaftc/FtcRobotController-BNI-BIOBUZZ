@@ -26,7 +26,7 @@ public class Red_FarLeft_One_B extends MovmentMain {
     public void pathLogic() {
         //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
         if (moveToPointChain.equals(start_to_shoot)) {
-            launch(1000, 1);
+            launch(1050, 1500, 3, 1);
             if (opmodeTimer.seconds() > 10) {
                 movePath(shoot_to_transit, pathingState.LOOP);
             }

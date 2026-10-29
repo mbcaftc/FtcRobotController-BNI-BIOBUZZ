@@ -71,21 +71,17 @@ public void init(){}//do not add anything needed for opmode to compile
         Pose b = new Pose(end.x(), end.y(), Math.toRadians(headingEnd));
         return line(a, b).linear(a, b);
     }
-    public void launch(double laucnhSpeed, double servoPower){
-        launcherMotor.setVelocity(laucnhSpeed);
-        //Launch if in gate and if current integer shot length is even, making sure that it doesnt fire too quickly
-        if(launcherMotor.getVelocity() > laucnhSpeed - 25) {
-            if(((int) shotTimer.seconds() * 9) % 2 == 0) {
+    public void launch(double laucnhSpeed, double maxSpeed, double time, double servoPower){
+        //Lerp for the velocity speed over launchtime (current time since first passing velocity gate / maxTime) (This is not AI, this is MEEEE)
+        launcherMotor.setVelocity(laucnhSpeed + (maxSpeed - laucnhSpeed) * Math.clamp(shotTimer.seconds() / time, 0, 1));
+
+        //Launch over minimum velocity
+        if(launcherMotor.getVelocity() > laucnhSpeed) {
                 transferServo.setPower(servoPower);
                 pollenServo.setPower(-servoPower);
                 spinNoBackServo.setPower(-servoPower);
                 intakeMotor.setPower(-1);
                 intakeMotorTwo.setPower(-1);
-            }
-            else{
-                transferServo.setPower(0);
-                pollenServo.setPower(0);
-            }
         }
         else{
             shotTimer.reset();
