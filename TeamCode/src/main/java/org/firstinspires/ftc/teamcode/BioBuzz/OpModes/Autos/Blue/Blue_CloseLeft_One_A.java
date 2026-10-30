@@ -18,7 +18,7 @@ public class Blue_CloseLeft_One_A extends BlueMain{
         //BlueMain init
         buildPaths();
         //Start the follower
-        follower.setPose(new Pose(startPose.x(), startPose.y(), Math.toRadians(270)));
+        follower.setPose(new Pose(startPose.x(), startPose.y(), Math.toRadians(90)));
         follower.update();
     }
 }
