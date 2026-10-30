@@ -259,7 +259,7 @@ public class TeleOP extends OpMode{
             }
             else{
                 //Recenter the turret to 5 degrees(straight ahead)
-                double avgAng = Math.abs(turretCurrentHeading) - 5;
+                double avgAng = Math.abs(turretCurrentHeading);
                 if (Math.abs(avgAng) > autoVariation) {
                     // Power scales with error
                     double power = kP * avgAng;

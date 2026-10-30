@@ -18,8 +18,8 @@ public class MovmentMain extends AutoMain{
     protected static  Pose StartFarLeft = new Pose(83, 132);//6
     protected static final Pose StartRightRight = new Pose(106, 132);//7
 
-    protected static final Pose ParkPoseA = new Pose(124, 45);//11
-    protected static final Pose ParkPoseB = new Pose(124, 25);//12
+    protected static final Pose ParkPoseA = new Pose(128, 50);//11
+    protected static final Pose ParkPoseB = new Pose(136, 25);//12
     protected static final Pose LooseBallsPickup =  new Pose(132, 133);//13
     protected static final Pose Quadrant1Center = new Pose(108, 108);//15
     protected static final Pose Quadrant2Center = new Pose(72, 108);//14

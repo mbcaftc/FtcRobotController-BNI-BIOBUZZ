@@ -14,7 +14,7 @@ public class BlueStartFar2Nav extends FarHiveTip{
         startPose = StartFarLeft;
         nav1 = Quadrant1Center;
         nav2 = MidAroundCloseHumans;
-        parkPose = ParkPoseB;
+        parkPose = ParkPoseA;
         //BlueMain init
         buildPaths();
         //Start the follower
