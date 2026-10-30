@@ -14,6 +14,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -30,7 +31,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.GoBildaPrismDri
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations;
 
 import java.util.List;
-
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "LerpTeleOP", group = "Drive")
 public class LerpTeleOP extends OpMode{
     public LerpTeleOP() {}
