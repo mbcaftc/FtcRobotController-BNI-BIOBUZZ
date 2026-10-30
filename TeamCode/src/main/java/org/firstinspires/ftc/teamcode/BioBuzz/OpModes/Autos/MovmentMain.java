@@ -18,8 +18,8 @@ public class MovmentMain extends AutoMain{
     protected static  Pose StartFarLeft = new Pose(83, 132);//6
     protected static final Pose StartRightRight = new Pose(106, 132);//7
 
-    protected static final Pose ParkPoseA = new Pose(124, 72);//11
-    protected static final Pose ParkPoseB = new Pose(132, 49);//12
+    protected static final Pose ParkPoseA = new Pose(124, 45);//11
+    protected static final Pose ParkPoseB = new Pose(124, 25);//12
     protected static final Pose LooseBallsPickup =  new Pose(132, 133);//13
     protected static final Pose Quadrant1Center = new Pose(108, 108);//15
     protected static final Pose Quadrant2Center = new Pose(72, 108);//14
@@ -34,30 +34,6 @@ public class MovmentMain extends AutoMain{
     protected static final Pose FlowerCloseEast = new Pose(115, 8.8 );//19
     protected static final Pose FlowerFarNorth = new Pose(132, 94);//22
     protected static final Pose FlowerFarSouth = new Pose(122, 94);//22
-
-    //RED
-
-    protected static  Pose RedStartCloseLeft = new Pose(61, 8.8);//1
-    protected static  Pose RedStartCloseRight = new Pose(38, 8.8);//2
-    protected static  Pose RedMidUnderHive = new Pose(60, 72);//3
-    protected static  Pose RedMidAroundCloseHive = new Pose(60, 72);//this is close to flower//4
-    protected static  Pose RedMidAroundCloseHumans = new Pose (20, 72 );//this is close to humans//5
-    protected static  Pose RedStartFarLeft = new Pose(61, 132);//6
-    protected static final Pose RedStartRightRight = new Pose(38, 132);//7
-    protected static final Pose RedParkPoseA = new Pose(20, 72);//11
-    protected static final Pose RedParkPoseB = new Pose(20, 72);//12
-    protected static final Pose RedLooseBallsPickup =  new Pose(12, 133);//13
-    protected static final Pose RedQuadrant1Center = new Pose(36, 108);//15
-    protected static final Pose RedQuadrant3Center = new Pose(72, 36);//16
-    protected static final Pose RedQuadrant4Center = new Pose(36, 36);//17
-    protected static final Pose RedFlowerClosePos = new Pose(49, 8.8);//18
-    protected static final Pose RedFlowerCloseAround = new Pose(49, 18);//19
-    protected static final Pose RedFlowerFarPos = new Pose(12, 94);//22
-    protected static final Pose RedFlowerFarAround = new Pose(22, 94);//22
-    protected static final Pose RedFlowerCloseWest= new Pose(64, 8.8);//18
-    protected static final Pose RedFlowerCloseEast = new Pose(29, 8.8 );//19
-    protected static final Pose RedFlowerFarNorth = new Pose(12, 94);//22
-    protected static final Pose RedFlowerFarSouth = new Pose(22, 94);//22
 
 
 
