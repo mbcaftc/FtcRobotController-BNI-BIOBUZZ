@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.Color;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations;
 
+import java.util.Collections;
 import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOP", group = "Drive")
@@ -86,6 +87,8 @@ public class TeleOP extends OpMode{
     double kStatic = 0.05;      // minimum power that actually moves the turret
     double maxTurretPower = 0.35;
     double turretDirection = -1; // flip to -1 if it turns away from the tag
+    double turretHeadingSign = 1; // flip to -1 if recentering turns away from center (1 = positive power increases heading)
+    double maxTurretAngle = 90;  // degrees either side of center the turret is allowed to go
 
 
     //</editor-fold>
@@ -159,8 +162,8 @@ public class TeleOP extends OpMode{
             double BBavgY = 0;
             int BBTags = 0;
 
-            //Average all tags positions that are within range
-            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            //Average all tags positions that are within range, ignore stale/invalid results
+            List<LLResultTypes.FiducialResult> fiducialResults = (result != null && result.isValid()) ? result.getFiducialResults() : Collections.<LLResultTypes.FiducialResult>emptyList();
 
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
 
@@ -261,8 +264,8 @@ public class TeleOP extends OpMode{
                 telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
             }
             else{
-                //Recenter the turret to 5 degrees(straight ahead)
-                double avgAng = Math.abs(turretCurrentHeading);
+                //Recenter the turret to 0 degrees(straight ahead), keep the sign so it turns back toward center
+                double avgAng = turretCurrentHeading;
                 if (Math.abs(avgAng) > autoVariation) {
                     // Power scales with error
                     double power = kP * avgAng;
@@ -273,7 +276,8 @@ public class TeleOP extends OpMode{
                     // Cap the speed so it can't build up too much momentum
                     power = Range.clip(power, -maxTurretPower, maxTurretPower);
 
-                    axonIncrementAmount = turretDirection * power;
+                    // Drive opposite the heading error
+                    axonIncrementAmount = -turretHeadingSign * power;
                     LEDCon(led, 1);
                 } else {
                     // Inside target window
@@ -418,7 +422,13 @@ public class TeleOP extends OpMode{
         spinNoBackServo.setPower(transferTrigger ? -1 : 0);
 
         //Move the transfer servo with += .1 deadzone
-        turretServo.setPower(axonIncrementAmount == 0.0 ? (Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount);
+        double turretPower = axonIncrementAmount == 0.0 ? (Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount;
+        //Soft limits, don't let the turret go past maxTurretAngle either way (auto or manual)
+        double headingChange = turretPower * turretHeadingSign;
+        if ((turretCurrentHeading > maxTurretAngle && headingChange > 0) || (turretCurrentHeading < -maxTurretAngle && headingChange < 0)) {
+            turretPower = 0;
+        }
+        turretServo.setPower(turretPower);
         axonIncrementAmount = 0.0;
 
 
