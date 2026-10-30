@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Start_At_Hive", group = "Drive")
+@Autonomous(name = "Start_At_Hive_close", group = "Drive")
 public class BlueStartFar2Nav extends FarHiveTip{
     @Override
     public void init(){

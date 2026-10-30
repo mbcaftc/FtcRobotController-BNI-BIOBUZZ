@@ -16,20 +16,19 @@ public class CloseHiveTipDelay extends MovmentMain {
     public Path start_to_park;
     public double startDelay;
     public Double shootTime;
-    public double parkRotation;
+
+
+
 
     public void buildPaths(){
+        Pose p0 = new Pose(startPose.x(), startPose.y(), Math.toRadians(90));
+        Pose p1 = new Pose(nav1.x(), nav1.y(), Math.toRadians(135));
+        Pose p2 = new Pose(parkPose.x(), parkPose.y(), Math.toRadians(180));
 
-        Pose p0 = new Pose(startPose.x(), startPose.y());
-        Pose p1 = new Pose(nav1.x(), nav1.y());
-        Pose p2 = new Pose(parkPose.x(), parkPose.y());
-
-
-        start_to_park = path(
-                line(p0, p1),
-                line(p1, p2)
-        ).constant(Math.toRadians(parkRotation));
+        start_to_park = path(line(p0, p1), line(p1, p2));
     }
+
+
 
     @Override
     public void pathLogic(){
@@ -38,13 +37,12 @@ public class CloseHiveTipDelay extends MovmentMain {
         }
         double currentTime = opmodeTimer.seconds();
 
-        if (currentTime < startDelay) {
-            ;
-        }
+        if (currentTime < startDelay) {}
         else if (currentTime >= startDelay && currentTime < startDelay + shootTime) {
             launch(960, 1225, 3, 1);
         }
         else {
+            cutPower();
             movePath(start_to_park, pathingState.PARK);
         }
 

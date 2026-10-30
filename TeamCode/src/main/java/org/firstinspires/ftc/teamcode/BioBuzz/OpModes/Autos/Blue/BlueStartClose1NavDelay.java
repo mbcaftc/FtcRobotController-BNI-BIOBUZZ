@@ -16,7 +16,6 @@ public class BlueStartClose1NavDelay extends CloseHiveTipDelay{
         parkPose = ParkPoseB;
         startDelay = 10;
         shootTime = 8.0;
-        parkRotation = 180;
         //BlueMain init
         buildPaths();
         //Start the follower
