@@ -66,6 +66,8 @@ public class TeleOP extends OpMode{
     *
     * */
 
+    public double flowerHeight = .57;
+
     //<editor-fold desc="Environment Vars">
     public boolean blueTeam = true;
     //</editor-fold>
@@ -134,7 +136,8 @@ public class TeleOP extends OpMode{
     
     //</editor-fold>
     public void autoTarget() {
-        result = limelight.getLatestResult();
+        if (gamepad2.y) {
+            result = limelight.getLatestResult();
 
             double RFavgX = 0;
             double RFavgY = 0;
@@ -210,7 +213,7 @@ public class TeleOP extends OpMode{
             BBavgX /= BBTags;
             BBavgY /= BBTags;
 
-        if (gamepad2.y) {
+
             //Check if any tags are being seen
             if(RFTags > 0 || RBTags > 0) {
                 //Take the lower of the 2 y values as the higher hive
@@ -344,6 +347,11 @@ public class TeleOP extends OpMode{
         telemetry.addData("Axon Position: %.2f Degrees", turretCurrentHeading);
         telemetry.addData("Using Default config: ", config1);
         telemetry.addData("Axon Increment: ", axonIncrementAmount);
+        telemetry.addData("FR", FrontRight.getPower());
+        telemetry.addData("FL", FrontLeft.getPower());
+        telemetry.addData("BR", BackRight.getPower());
+        telemetry.addData("BL", BackLeft.getPower());
+        telemetry.addData("Flower Percent: ", flowerHeight);
         telemetry.update();
     }
     public void calcTurretPos(){
@@ -374,6 +382,8 @@ public class TeleOP extends OpMode{
         //Step once per press, not every loop while held
         if(gamepad2.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
         if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
+        if(gamepad2.dpadLeftWasPressed()){flowerHeight -= .01;}
+        if(gamepad2.dpadRightWasPressed()){flowerHeight += .01;}
         if(gamepad1.xWasPressed()){config1 = !config1;}
 
         if(gamepad1.dpadUpWasPressed()){
@@ -386,7 +396,7 @@ public class TeleOP extends OpMode{
     }
     public void runMotors(){
         //Check if any movement inputs are greater than .2 deadzone
-        if(Math.max(Math.max(Math.abs(gamepad1.left_stick_x), Math.abs(gamepad1.left_stick_y)), Math.abs(gamepad1.right_stick_x)) > .2){
+        if(Math.max(Math.max(Math.abs(gamepad1.left_stick_x), Math.abs(gamepad1.left_stick_y)), Math.abs(gamepad1.right_stick_x)) > .2 && !gamepad2.left_bumper){
             //Apply motor power based on established triggers from inputHandling(), add dampening
             double intakeDirection = gamepad1.left_bumper ? .6 : -.6;
             intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
@@ -412,9 +422,9 @@ public class TeleOP extends OpMode{
         axonIncrementAmount = 0.0;
 
 
+
         //Moves the flower axon servo to an up position of 0, and down position of .4.
-        flowerAxon.setPosition(flowerAxonTrigger ? .6 : 0);
-        flowerAxon.setPosition(flowerAxonTrigger ? .6 : 0);
+        flowerAxon.setPosition(flowerAxonTrigger ? gamepad2.dpad_up ? .2 : flowerHeight : 0);
     }
     @Override
     public void init() {
@@ -479,7 +489,6 @@ public class TeleOP extends OpMode{
 
         //Control the input triggers
         inputHandling();
-
 
         //Limelight and targeting
         autoTarget();
