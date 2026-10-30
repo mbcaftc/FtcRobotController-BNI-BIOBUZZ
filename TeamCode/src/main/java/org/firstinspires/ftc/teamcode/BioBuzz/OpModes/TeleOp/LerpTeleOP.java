@@ -408,7 +408,7 @@ public class LerpTeleOP extends OpMode{
         intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
 
         //Velocity control when on, coast down when off instead of braking the flywheel
-        if(launcherTrigger){launch(1050, 1350, 3, 1);}
+        if(launcherTrigger){launch(960, 1225, 3, 1);}
         else{launcherMotor.setPower(0);}
 
         transferServo.setPower(transferTrigger ? 1 : 0);
