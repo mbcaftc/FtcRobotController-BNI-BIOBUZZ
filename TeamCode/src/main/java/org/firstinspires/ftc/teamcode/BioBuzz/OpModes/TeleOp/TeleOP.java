@@ -374,7 +374,7 @@ public class TeleOP extends OpMode{
         //Step once per press, not every loop while held
         if(gamepad2.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
         if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
-        //if(gamepad1.xWasPressed()){config1 = !config1;}
+        if(gamepad1.xWasPressed()){config1 = !config1;}
 
         if(gamepad1.dpadUpWasPressed()){
             blueTeam = !blueTeam;
@@ -388,7 +388,7 @@ public class TeleOP extends OpMode{
         //Check if any movement inputs are greater than .2 deadzone
         if(Math.max(Math.max(Math.abs(gamepad1.left_stick_x), Math.abs(gamepad1.left_stick_y)), Math.abs(gamepad1.right_stick_x)) > .2){
             //Apply motor power based on established triggers from inputHandling(), add dampening
-            double intakeDirection = gamepad1.left_bumper ? .4 : -.4;
+            double intakeDirection = gamepad1.left_bumper ? .6 : -.6;
             intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
             intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
         }
@@ -413,7 +413,8 @@ public class TeleOP extends OpMode{
 
 
         //Moves the flower axon servo to an up position of 0, and down position of .4.
-        flowerAxon.setPosition(flowerAxonTrigger ? .5 : 0);
+        flowerAxon.setPosition(flowerAxonTrigger ? .6 : 0);
+        flowerAxon.setPosition(flowerAxonTrigger ? .6 : 0);
     }
     @Override
     public void init() {
