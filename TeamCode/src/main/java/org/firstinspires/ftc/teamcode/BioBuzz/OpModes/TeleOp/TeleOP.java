@@ -69,10 +69,11 @@ public class TeleOP extends OpMode{
     *
     * */
 
-    public double flowerHeight = .57;
+
 
     //<editor-fold desc="Environment Vars">
     public boolean blueTeam = true;
+    public double flowerHeight = .57;
     //</editor-fold>
     //<editor-fold desc="AutoTargeting Variables">
     //Limelight Cam data
