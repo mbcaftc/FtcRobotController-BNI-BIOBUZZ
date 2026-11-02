@@ -23,17 +23,13 @@ public class CloseHiveTipDelay extends MovmentMain {
     public void buildPaths(){
         Pose p0 = new Pose(startPose.x(), startPose.y());
         Pose p1 = new Pose(nav1.x(), nav1.y());
-        Pose p3 = new Pose(parkPose.x(), parkPose.y());
+        Pose p2 = new Pose(parkPose.x(), parkPose.y());
 
+        double startAngle = Math.toRadians(90);
+        double endAngle = Math.toRadians(180);
 
-        start_to_park = path(
-                line(p0, p1),
-                line(p1, p3)
-        ).constant(Math.toRadians(270));
+        start_to_park = path(line(p0, p1), line(p1, p2)).linear(startAngle, endAngle);
     }
-
-
-
 
     @Override
     public void pathLogic(){

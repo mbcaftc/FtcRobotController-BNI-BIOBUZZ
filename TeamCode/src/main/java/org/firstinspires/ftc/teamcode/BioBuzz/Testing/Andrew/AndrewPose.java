@@ -5,6 +5,10 @@ import com.pedropathing.math.Pose;
 public class AndrewPose {
     public double x;
     public double y;
+    public AndrewPose(Pose thisPose){
+        this.x = thisPose.x();
+        this.y = thisPose.y();
+    }
     public AndrewPose(double xPos, double yPos){
         this.x = xPos;
         this.y = yPos;
