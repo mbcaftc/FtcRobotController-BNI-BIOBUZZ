@@ -9,26 +9,19 @@ import com.pedropathing.paths.Path;
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 
 public class AndewFarHiveTip extends MovmentMain {
-    public AndrewPose startPose;
-    public AndrewPose nav1;
-    public AndrewPose nav2;
-    public AndrewPose parkPose;
+    public Pose startPose;
+    public Pose nav1;
+    public Pose nav2;
+    public Pose parkPose;
 
     public Path start_to_park;
 
     public void buildPaths(){
-
-        Pose p0 = startPose.poseHeadingDegrees(270);
-        Pose p1 = nav1.poseHeadingDegrees(180);
-        Pose p2 = nav2.poseHeadingDegrees(90);
-        Pose p3 = parkPose.poseHeadingDegrees(0);
-
-
         start_to_park = path(
-                line(p0, p1),
-                line(p1, p2),
-                line(p2, p3)
-        ).tangent();
+                line(startPose, nav1).constant(startPose),
+                line(nav1, nav2).tangent(),
+                line(nav2, parkPose).constant(parkPose)
+        );
     }
 
     @Override

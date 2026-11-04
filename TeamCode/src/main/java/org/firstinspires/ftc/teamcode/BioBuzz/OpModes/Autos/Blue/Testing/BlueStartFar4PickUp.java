@@ -3,16 +3,11 @@ package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.Testing;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.FarHiveTip;
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
-import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.AndrewPose;
 
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.api.Paths.path;
 
-import android.widget.Switch;
-
-import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
