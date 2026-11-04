@@ -120,6 +120,10 @@ public void init(){}//do not add anything needed for opmode to compile
         intakeMotorTwo.setPower(0);
         launcherMotor.setVelocity(0);
     }
+    public void intake(double power){
+        intakeMotor.setPower(power);
+        intakeMotorTwo.setPower(power);
+    }
 
 
 
