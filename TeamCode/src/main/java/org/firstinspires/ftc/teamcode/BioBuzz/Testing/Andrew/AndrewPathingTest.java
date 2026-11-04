@@ -13,7 +13,7 @@ public class AndrewPathingTest extends AndewFarHiveTip {
         startPose = new UniPose(StartFarLeft).setDeg(270);
         nav1 = new UniPose(Quadrant1Center).pose();
         nav2 = new UniPose(MidAroundCloseHumans).pose();
-        parkPose = new UniPose(ParkPoseA).pose();
+        parkPose = new UniPose(ParkPoseA).setDeg(180);
         //BlueMain init
         buildPaths();
         //Start the follower
