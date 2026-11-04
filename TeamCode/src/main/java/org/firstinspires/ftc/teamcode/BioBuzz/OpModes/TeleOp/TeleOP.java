@@ -135,7 +135,7 @@ public class TeleOP extends OpMode{
     boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 1100;
+    public double pollenTargetVelocity = 930;
     public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
     public double axonIncrementAmount = 0;

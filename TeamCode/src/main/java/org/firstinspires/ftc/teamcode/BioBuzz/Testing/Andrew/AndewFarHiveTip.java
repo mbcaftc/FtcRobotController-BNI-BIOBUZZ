@@ -19,15 +19,15 @@ public class AndewFarHiveTip extends MovmentMain {
     public void buildPaths(){
 
         Pose p0 = startPose.poseHeadingDegrees(270);
-        Pose p1 = nav1.poseHeadingDegrees(0);
+        Pose p1 = nav1.poseHeadingDegrees(180);
         Pose p2 = nav2.poseHeadingDegrees(90);
-        Pose p3 = parkPose.poseHeadingDegrees(180);
+        Pose p3 = parkPose.poseHeadingDegrees(0);
 
 
         start_to_park = path(
-                line(p0, p1),
-                line(p1, p2),
-                line(p2, p3)
+                line(p0, p1).linear(p0, p1),
+                line(p1, p2).linear(p1, p2),
+                line(p2, p3).linear(p2, p3)
         );
     }
 
