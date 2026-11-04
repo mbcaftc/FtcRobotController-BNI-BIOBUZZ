@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos;
 
 import static com.pedropathing.api.Paths.line;
+import static com.pedropathing.api.Paths.path;
 
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addCRServo;
@@ -66,6 +67,25 @@ public void init(){}//do not add anything needed for opmode to compile
     public void loop() {}
 
     //Headings are in degrees, Pedro uses radians
+    public Path buildPaths(Pose... poseList) {
+
+        Path[] segments = new Path[poseList.length - 1];//cause its a list of path between two point 1 less then total length
+        for (int i = 0; i < poseList.length - 1; i++) {
+            Pose current = poseList[i];
+            Pose next = poseList[i + 1];
+
+            Pose pStart = new Pose(current.x(), current.y());
+            Pose pEnd = new Pose(next.x(), next.y());
+
+            double StartAngle = Math.toRadians(current.heading());
+            double EndAngle = Math.toRadians(next.heading());
+
+            segments[i] = line(pStart, pEnd).linear(StartAngle, EndAngle);
+        }
+
+        return path(segments);
+    }
+
     public static Path createLinearPath(Pose start, Pose end, double headingStart, double headingEnd) {
         Pose a = new Pose(start.x(), start.y(), Math.toRadians(headingStart));
         Pose b = new Pose(end.x(), end.y(), Math.toRadians(headingEnd));
