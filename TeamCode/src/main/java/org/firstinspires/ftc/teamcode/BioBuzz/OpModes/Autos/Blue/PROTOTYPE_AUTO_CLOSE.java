@@ -33,7 +33,7 @@ public class PROTOTYPE_AUTO_CLOSE extends BlueMain{
         //AutoMain init
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildPaths())
+        //Set BlueMain points (BEFORE buildConstantPaths())
         startPose = StartCloseLeft;
         shootPose = Quadrant3Back;
         parkPose = ParkPoseB;

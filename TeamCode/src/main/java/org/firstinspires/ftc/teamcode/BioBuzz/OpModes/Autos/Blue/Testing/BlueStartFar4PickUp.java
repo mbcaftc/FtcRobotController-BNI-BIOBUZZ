@@ -30,15 +30,15 @@ public class BlueStartFar4PickUp extends MovmentMain {
         //AutoMain init
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildPaths())
+        //Set BlueMain points (BEFORE buildConstantPaths())
 
         //pre PickUp
         Pose start = new Pose(StartFarLeft.x(), StartFarLeft.y(), 0);
-        prePickup = buildPaths(StartFarLeft, PreLooseBallsPickup);
+        prePickup = buildConstantPaths(StartFarLeft, PreLooseBallsPickup);
         //PickUp
-        Pickup = buildPaths(PreLooseBallsPickup.withHeading(0), LooseBallsPickup.withHeading(0), PreLooseBallsPickup.withHeading(0));
+        Pickup = buildConstantPaths(PreLooseBallsPickup.withHeading(0), LooseBallsPickup.withHeading(0), PreLooseBallsPickup.withHeading(0));
         //park
-        Park = buildPaths(PreLooseBallsPickup.withHeading(0), Quadrant1Center.withHeading(90), ParkPoseA.withHeading(180));
+        Park = buildConstantPaths(PreLooseBallsPickup.withHeading(0), Quadrant1Center.withHeading(90), ParkPoseA.withHeading(180));
         //Start the follower
 
 

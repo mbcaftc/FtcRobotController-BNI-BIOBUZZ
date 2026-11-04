@@ -9,7 +9,7 @@ public class AndrewPathingTest extends AndewFarHiveTip {
         //AutoMain init
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildPaths())
+        //Set BlueMain points (BEFORE buildConstantPaths())
         startPose = new UniPose(StartFarLeft).setDeg(270);
         nav1 = new UniPose(Quadrant1Center).pose();
         nav2 = new UniPose(MidAroundCloseHumans).pose();

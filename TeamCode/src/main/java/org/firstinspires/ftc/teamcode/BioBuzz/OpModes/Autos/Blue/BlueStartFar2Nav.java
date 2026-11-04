@@ -10,7 +10,7 @@ public class BlueStartFar2Nav extends FarHiveTip{
         //AutoMain init
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildPaths())
+        //Set BlueMain points (BEFORE buildConstantPaths())
         startPose = StartFarLeft;
         nav1 = Quadrant1Center;
         nav2 = MidAroundCloseHumans;

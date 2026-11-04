@@ -20,13 +20,13 @@ public class AndewFarHiveTip extends MovmentMain {
         start_to_park = path(
                 line(startPose, nav1).constant(startPose),
                 line(nav1, nav2).tangent(),
-                line(nav2, parkPose).constant(parkPose)
+                line(nav2, parkPose).linear(nav2, parkPose)
         );
     }
 
     @Override
     public void pathLogic(){
-        launch(960, 1225, 3, 1);
+        launch(930, 930, 3, 1);
         if (opmodeTimer.seconds() > 10) {
             cutPower();
             movePath(start_to_park, pathingState.PARK);

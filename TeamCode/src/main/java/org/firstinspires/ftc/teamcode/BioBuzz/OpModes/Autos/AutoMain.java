@@ -67,7 +67,7 @@ public void init(){}//do not add anything needed for opmode to compile
     public void loop() {}
 
     //Headings are in degrees, Pedro uses radians
-    public Path buildPaths(Pose... poseList) {
+    public Path buildConstantPaths(Pose... poseList) {
 
         Path[] segments = new Path[poseList.length - 1];//cause its a list of path between two point 1 less then total length
         for (int i = 0; i < poseList.length - 1; i++) {

@@ -11,7 +11,7 @@ public class Blue_CloseLeft_One_A extends BlueMain{
         //AutoMain init
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildPaths())
+        //Set BlueMain points (BEFORE buildConstantPaths())
         startPose = StartCloseLeft;
         shootPose = Quadrant3Back;
         parkPose = ParkPoseB;
