@@ -2,82 +2,97 @@ package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.Testing;
 
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.FarHiveTip;
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
-import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.AndrewPose;
-
-import static com.pedropathing.api.Paths.line;
-import static com.pedropathing.api.Paths.path;
-
-import android.widget.Switch;
-
-import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
+
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
-    Path start_to_park;
-    ScoringState CurrentState;
-    enum ScoringState {
-        Waiting,
-        Shooting,
-        GoingToPickUp,
-        Pickup,
-        Park
+    protected double PreDelay = 0; //time before anything happens
+    protected double ShootingTime = 0; //tme in opmode where shooting ends
+
+
+    private ScoringState currentState;
+
+    private enum ScoringState {
+
+        Pre,
+        WAITING,
+        SHOOTING,
+        GOING_TO_PICKUP,
+        START_INTAKE,
+        STOP_INTAKE,
+        PARK
     }
 
-    Path prePickup;
-    Path Pickup;
-    Path Park;
+    private Path prePickup;
+    private Path pickup;
+    private Path park;
+    protected double turretStartAngle;
 
     @Override
-    public void init(){
-        //AutoMain init
+    public void init() {
+        // AutoMain setup routines
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildPaths())
 
-        //pre PickUp
-        Pose start = new Pose(StartFarLeft.x(), StartFarLeft.y(), 0);
+        Pose start = new Pose(StartFarLeft.x(), StartFarLeft.y(), Math.toRadians(0));
         prePickup = buildPaths(StartFarLeft, PreLooseBallsPickup);
-        //PickUp
-        Pickup = buildPaths(PreLooseBallsPickup.withHeading(0), LooseBallsPickup.withHeading(0), PreLooseBallsPickup.withHeading(0));
-        //park
-        Park = buildPaths(PreLooseBallsPickup.withHeading(0), Quadrant1Center.withHeading(90), ParkPoseA.withHeading(180));
-        //Start the follower
+        pickup = buildPaths(PreLooseBallsPickup.withHeading(Math.toRadians(0)), LooseBallsPickup.withHeading(Math.toRadians(0)), PreLooseBallsPickup.withHeading(Math.toRadians(0)));
+        park = buildPaths(PreLooseBallsPickup.withHeading(Math.toRadians(0)), Quadrant1Center.withHeading(Math.toRadians(90)), ParkPoseA.withHeading(Math.toRadians(180)));
 
-
+        turretStartAngle = 0.0;
         follower.setPose(new Pose(start.x(), start.y(), start.heading()));
         follower.update();
-        CurrentState = ScoringState.Waiting;//Waiting nothing is happening started in start
+        currentState = ScoringState.Pre;
     }
+
     @Override
-    public void start(){
-        CurrentState = ScoringState.Shooting;//Begins shooting
+    public void start() {
+        currentState = ScoringState.WAITING;
     }
+
     @Override
-    public void pathLogic(){
-        switch(CurrentState){
-            case Waiting:
+    public void pathLogic() {
+        switch (currentState) {
+            case Pre:
+                break;//this should never run
+            case WAITING:
+                if (opmodeTimer.seconds() > PreDelay) currentState = ScoringState.SHOOTING;
                 break;
-            case Shooting:
+
+            case SHOOTING:
                 launch(960, 1225, 3, 1);
-                if (opmodeTimer.seconds() > 10) CurrentState = ScoringState.GoingToPickUp;
+                if (opmodeTimer.seconds() > ShootingTime) {
+                    currentState = ScoringState.GOING_TO_PICKUP;
+                }
                 break;
-            case GoingToPickUp:
+
+            case GOING_TO_PICKUP:
                 cutPower();
                 movePath(prePickup, pathingState.LOOP);
-                CurrentState = ScoringState.GoingToPickUp;
+                currentState = ScoringState.START_INTAKE;
                 break;
-            case Pickup:
+
+            case START_INTAKE:
                 intake(1);
-                movePath(Pickup, pathingState.LOOP);
-                intake(0);
-                CurrentState = ScoringState.Park;
+                movePath(pickup, pathingState.LOOP);
+                currentState = ScoringState.STOP_INTAKE;
                 break;
-            case Park:
-                movePath(Park, pathingState.PARK);
+
+            case STOP_INTAKE:
+                intake(0);
+                currentState = ScoringState.PARK;
+                break;
+
+            case PARK:
+                movePath(park, pathingState.PARK);
+                currentState = ScoringState.WAITING; // Protects from refreshing path instruction every loop frame
+                break;
         }
     }
+    @Override
+    public void loop(){
+        super.loop();
+        telemetry.addData("Scoring State:", currentState);
+    }
 }
-
