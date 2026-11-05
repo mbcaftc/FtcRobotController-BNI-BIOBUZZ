@@ -19,7 +19,7 @@ public class BlueMain extends MovmentMain {
     }
 
     @Override
-    public void pathLogic(){
+    public void pathLogic() {
         //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
         if (moveToPointChain.equals(start_to_shoot)) {
             launch(1050, 1500, 3, 1);
@@ -27,52 +27,11 @@ public class BlueMain extends MovmentMain {
                 cutPower();
                 movePath(shoot_to_park, pathingState.PARK);
             }
-        }
-        else{
+        } else {
             //If there is not a path assigned to moveToPointChain, assign it the first path of start_to_shoot
             movePath(start_to_shoot, pathingState.LOOP);
             //Spin up launcher early
             launcherMotor.setVelocity(1100);
-        }
-    }
-    private enum AutoState {
-        START_TO_SHOOT,
-        SHOOTING,
-        SHOOT_TO_PARK,
-        PARKED
-    }
-    private AutoState currentState;
-    @Override
-    public void pathLogic(boolean a) {
-        //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
-
-        if (currentState == null){
-            currentState = AutoState.START_TO_SHOOT;
-        }
-        switch (currentState){
-            case START_TO_SHOOT:
-                //Move initial path
-                movePath(start_to_shoot, pathingState.LOOP);
-                currentState = AutoState.SHOOTING;
-                break;
-            case SHOOTING:
-                launch(1050, 1500, 3, 1);
-                if (opmodeTimer.seconds() > 10) {
-                    currentState = AutoState.SHOOT_TO_PARK;
-                }
-                break;
-            case SHOOT_TO_PARK:
-                if (!moveToPointChain.equals(shoot_to_park)) {
-                    movePath(shoot_to_park, pathingState.PARK);
-                }
-                else{
-                    currentState = AutoState.PARKED;
-                }
-                break;
-            case PARKED:
-                break;
-            default:
-                break;
         }
     }
 }
