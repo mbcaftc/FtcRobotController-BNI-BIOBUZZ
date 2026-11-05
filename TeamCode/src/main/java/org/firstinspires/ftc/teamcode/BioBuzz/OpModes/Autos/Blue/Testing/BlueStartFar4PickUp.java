@@ -33,16 +33,15 @@ public class BlueStartFar4PickUp extends MovmentMain {
         //Set BlueMain points (BEFORE buildConstantPaths())
 
         //pre PickUp
-        Pose start = new Pose(StartFarLeft.x(), StartFarLeft.y(), 0);
-        prePickup = buildConstantPaths(StartFarLeft, PreLooseBallsPickup);
+        prePickup = buildConstantPaths(StartFarLeft.pose(), PreLooseBallsPickup.pose());
         //PickUp
-        Pickup = buildConstantPaths(PreLooseBallsPickup.withHeading(0), LooseBallsPickup.withHeading(0), PreLooseBallsPickup.withHeading(0));
+        Pickup = buildConstantPaths(PreLooseBallsPickup.pose(), LooseBallsPickup.pose(), PreLooseBallsPickup.pose());
         //park
-        Park = buildConstantPaths(PreLooseBallsPickup.withHeading(0), Quadrant1Center.withHeading(90), ParkPoseA.withHeading(180));
+        Park = buildConstantPaths(PreLooseBallsPickup.pose(), Quadrant1Center.setDeg(90), ParkPoseA.setDeg(180));
         //Start the follower
 
 
-        follower.setPose(new Pose(start.x(), start.y(), start.heading()));
+        follower.setPose(StartFarLeft.pose());
         follower.update();
         CurrentState = ScoringState.Waiting;//Waiting nothing is happening started in start
     }

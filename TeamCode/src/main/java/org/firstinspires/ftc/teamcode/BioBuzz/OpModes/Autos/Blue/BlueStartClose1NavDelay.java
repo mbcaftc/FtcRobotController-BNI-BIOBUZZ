@@ -11,9 +11,9 @@ public class BlueStartClose1NavDelay extends CloseHiveTipDelay{
         setup();
         initHardWare();
         //Set BlueMain points (BEFORE buildConstantPaths())
-        startPose = StartCloseLeft;
-        nav1 = Quadrant3Center;
-        parkPose = ParkPoseB;
+        startPose = StartCloseLeft.pose();
+        nav1 = Quadrant3Center.pose();
+        parkPose = ParkPoseB.pose();
         startDelay = 10;
         shootTime = 8.0;
         //BlueMain init

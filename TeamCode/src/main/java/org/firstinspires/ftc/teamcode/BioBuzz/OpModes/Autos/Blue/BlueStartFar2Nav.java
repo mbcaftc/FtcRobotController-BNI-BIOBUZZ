@@ -11,10 +11,10 @@ public class BlueStartFar2Nav extends FarHiveTip{
         setup();
         initHardWare();
         //Set BlueMain points (BEFORE buildConstantPaths())
-        startPose = StartFarLeft;
-        nav1 = Quadrant1Center;
-        nav2 = MidAroundCloseHumans;
-        parkPose = ParkPoseA;
+        startPose = StartFarLeft.pose();
+        nav1 = Quadrant1Center.pose();
+        nav2 = MidAroundCloseHumans.pose();
+        parkPose = ParkPoseA.pose();
         //BlueMain init
         buildPaths();
         //Start the follower

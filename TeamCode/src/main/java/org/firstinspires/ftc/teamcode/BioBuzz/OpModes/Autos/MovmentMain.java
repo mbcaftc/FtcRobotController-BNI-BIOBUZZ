@@ -4,40 +4,37 @@ import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 
+import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.UniPose;
+
 public class MovmentMain extends AutoMain{
-
-
     protected static final PoseFactory poseFactory = PoseFactory.degrees();
 
-    protected static  Pose StartCloseLeft = new Pose(72, 8.8);//1
-    protected static  Pose StartCloseRight = new Pose(106, 8.8);//2
-    protected static  Pose MidUnderHive = new Pose(84, 72);//3
+    protected static UniPose StartCloseLeft = new UniPose(72, 8.8);//1
+    protected static  UniPose StartCloseRight = new UniPose(106, 8.8);//2
+    protected static  UniPose MidUnderHive = new UniPose(84, 72);//3
 
-    protected static  Pose MidAroundCloseHive = new Pose(84, 72);//this is close to flower//4
-    protected static  Pose MidAroundCloseHumans = new Pose (124, 72 );//this is close to humans//5
-    protected static  Pose StartFarLeft = new Pose(83, 132);//6
-    protected static final Pose StartRightRight = new Pose(106, 132);//7
+    protected static  UniPose MidAroundCloseHive = new UniPose(84, 72);//this is close to flower//4
+    protected static  UniPose MidAroundCloseHumans = new UniPose (124, 72 );//this is close to humans//5
+    protected static  UniPose StartFarLeft = new UniPose(83, 132);//6
+    protected static final UniPose StartRightRight = new UniPose(106, 132);//7
 
-    protected static final Pose ParkPoseA = new Pose(128, 47);//11
-    protected static final Pose ParkPoseB = new Pose(136, 25);//12
-    protected static final Pose LooseBallsPickup =  new Pose(135, 133);//13
-    protected static final Pose PreLooseBallsPickup =  new Pose(110, 133);//
-    protected static final Pose Quadrant1Center = new Pose(108, 108);//15
-    protected static final Pose Quadrant2Center = new Pose(72, 108);//14
-    protected static final Pose Quadrant3Center = new Pose(72, 36);//16
-    protected static final Pose Quadrant3Back = new Pose(72, 16);//
-    protected static final Pose Quadrant4Center = new Pose(108, 36);//17
-    protected static final Pose FlowerClosePos = new Pose(95, 8.8);//18
-    protected static final Pose FlowerCloseAround = new Pose(95, 18);//19
-    protected static final Pose FlowerFarPos = new Pose(132, 94);//22
-    protected static final Pose FlowerFarAround = new Pose(122, 94);//22
-    protected static final Pose FlowerCloseWest= new Pose(80, 8.8);//18
-    protected static final Pose FlowerCloseEast = new Pose(115, 8.8 );//19
-    protected static final Pose FlowerFarNorth = new Pose(132, 94);//22
-    protected static final Pose FlowerFarSouth = new Pose(122, 94);//22
-
-
-
+    protected static final UniPose ParkPoseA = new UniPose(128, 47);//11
+    protected static final UniPose ParkPoseB = new UniPose(136, 25);//12
+    protected static final UniPose LooseBallsPickup =  new UniPose(135, 133);//13
+    protected static final UniPose PreLooseBallsPickup =  new UniPose(110, 133);//
+    protected static final UniPose Quadrant1Center = new UniPose(108, 108);//15
+    protected static final UniPose Quadrant2Center = new UniPose(72, 108);//14
+    protected static final UniPose Quadrant3Center = new UniPose(72, 36);//16
+    protected static final UniPose Quadrant3Back = new UniPose(72, 16);//
+    protected static final UniPose Quadrant4Center = new UniPose(108, 36);//17
+    protected static final UniPose FlowerClosePos = new UniPose(95, 8.8);//18
+    protected static final UniPose FlowerCloseAround = new UniPose(95, 18);//19
+    protected static final UniPose FlowerFarPos = new UniPose(132, 94);//22
+    protected static final UniPose FlowerFarAround = new UniPose(122, 94);//22
+    protected static final UniPose FlowerCloseWest= new UniPose(80, 8.8);//18
+    protected static final UniPose FlowerCloseEast = new UniPose(115, 8.8 );//19
+    protected static final UniPose FlowerFarNorth = new UniPose(132, 94);//22
+    protected static final UniPose FlowerFarSouth = new UniPose(122, 94);//22
 
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
@@ -49,22 +46,13 @@ public class MovmentMain extends AutoMain{
 
     //State to return to after moveToPoint case
     public pathingState returnState;
-
     public Path moveToPointChain;
-
-
-
     public void movePath(Path path, MovmentMain.pathingState state){
         moveToPointChain = path;
         returnState = state;
         pathState = pathingState.MOVETOPOINT;
     }
-
-
-
     public void pathLogic(){}//this is being overwritten
-    public void pathLogic(boolean a){}
-
     @Override
     public void loop() {
         follower.update();

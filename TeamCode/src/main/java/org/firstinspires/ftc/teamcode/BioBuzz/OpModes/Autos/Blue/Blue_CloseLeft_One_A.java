@@ -12,9 +12,9 @@ public class Blue_CloseLeft_One_A extends BlueMain{
         setup();
         initHardWare();
         //Set BlueMain points (BEFORE buildConstantPaths())
-        startPose = StartCloseLeft;
-        shootPose = Quadrant3Back;
-        parkPose = ParkPoseB;
+        startPose = StartCloseLeft.pose();
+        shootPose = Quadrant3Back.pose();
+        parkPose = ParkPoseB.pose();
         //BlueMain init
         buildPaths();
         //Start the follower
