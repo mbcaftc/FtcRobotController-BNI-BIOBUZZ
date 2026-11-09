@@ -24,8 +24,8 @@ public class MovmentMain extends AutoMain{
     protected static final UniPose PreLooseBallsPickup =  new UniPose(110, 133);//
     protected static final UniPose Quadrant1Center = new UniPose(108, 108);//15
     protected static final UniPose Quadrant2Center = new UniPose(72, 108);//14
-    protected static final UniPose Quadrant3Center = new UniPose(72, 36);//16
-    protected static final UniPose Quadrant3Back = new UniPose(72, 16);//
+    protected static final UniPose Quadrant3Center = new UniPose(83, 36);//16
+    protected static final UniPose Quadrant3Back = new UniPose(83, 16);//
     protected static final UniPose Quadrant4Center = new UniPose(108, 36);//17
     protected static final UniPose FlowerClosePos = new UniPose(95, 8.8);//18
     protected static final UniPose FlowerCloseAround = new UniPose(95, 18);//19

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
+import static com.pedropathing.api.Paths.curve;
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.api.Paths.path;
 
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
+import com.pedropathing.paths.interpolator.Interpolator;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 
@@ -20,7 +22,7 @@ public class AndewFarHiveTip extends MovmentMain {
         start_to_park = path(
                 line(startPose, nav1).constant(startPose),
                 line(nav1, nav2).tangent(),
-                line(nav2, parkPose).linear(nav2, parkPose)
+                line(nav2, parkPose).constant(parkPose)
         );
     }
 
