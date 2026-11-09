@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "AndrewAutoTest", group = "Debug")
+@Autonomous(name = "AndrewTwoHive", group = "Debug")
 public class AndrewPathingTwoHive extends AndewFarDoubleHive {
     @Override
     public void init(){
