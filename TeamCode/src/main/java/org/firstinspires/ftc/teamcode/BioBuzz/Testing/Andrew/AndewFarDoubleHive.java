@@ -16,14 +16,19 @@ public class AndewFarDoubleHive extends MovmentMain {
     public Pose nav3;
     public Pose parkPose;
 
-    public Path start_to_shoot;
+    public Path start_to_nav2;
+    public Path nav2_to_shoot;
     public Path shoot_to_park;
 
     public void buildPaths(){
-        start_to_shoot = path(
+        //Drive under the hives facing south and come to a full stop at nav2 (no turning at speed)
+        start_to_nav2 = path(
                 line(startPose, nav1).constant(startPose),
-                line(nav1, nav2).tangent(),
-                line(nav2, shootingPose).constant(shootingPose)
+                line(nav1, nav2).constant(nav2)
+        );
+        //From a stop, turn gradually while backing into the shooting pose
+        nav2_to_shoot = path(
+                line(nav2, shootingPose).linear(nav2, shootingPose)
         );
         shoot_to_park = path(
                 //line(shootingPose, nav3).tangent(),
@@ -33,7 +38,11 @@ public class AndewFarDoubleHive extends MovmentMain {
 
     @Override
     public void pathLogic(){
-        if(moveToPointChain.equals(start_to_shoot)) {
+        if(moveToPointChain.equals(start_to_nav2)) {
+            //Follower is no longer busy here, so the robot has stopped at nav2; now turn into the shot
+            movePath(nav2_to_shoot, pathingState.LOOP);
+        }
+        else if(moveToPointChain.equals(nav2_to_shoot)) {
             launch(930, 930, 3, 1);
             if (opmodeTimer.seconds() > 15) {
                 cutPower();
@@ -44,7 +53,7 @@ public class AndewFarDoubleHive extends MovmentMain {
             launch(930, 930, 3, 1);
             if (opmodeTimer.seconds() > 6) {
                 cutPower();
-                movePath(start_to_shoot, pathingState.LOOP);
+                movePath(start_to_nav2, pathingState.LOOP);
             }
         }
     }

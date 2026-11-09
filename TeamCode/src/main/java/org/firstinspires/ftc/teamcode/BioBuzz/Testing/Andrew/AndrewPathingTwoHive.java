@@ -13,7 +13,7 @@ public class AndrewPathingTwoHive extends AndewFarDoubleHive {
         startPose = StartFarLeft.setDeg(270);
         nav1 = MidUnderHive.setDeg(270);
         nav2 = Quadrant3Center.setDeg(270);
-        shootingPose = Quadrant3Back.setDeg(90);
+        shootingPose = new UniPose(83, 22).setDeg(90); //Quadrant3Back (y=16) left too little room before the audience wall
         nav3 = Quadrant4Center.setDeg(135);
         parkPose = ParkPoseB.setDeg(180);
         //BlueMain init
