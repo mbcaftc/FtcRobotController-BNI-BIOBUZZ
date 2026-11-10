@@ -27,6 +27,7 @@ public abstract class AllianceTeleOP extends TeleOP {
 
     @Override
     public void autoTarget() {
+        boolean onTarget = false;
         if (gamepad2.y) {
             result = limelight.getLatestResult();
 
@@ -85,6 +86,7 @@ public abstract class AllianceTeleOP extends TeleOP {
                     // Inside target window
                     axonIncrementAmount = 0.0;
                     LEDCon(led, 4);
+                    onTarget = true;
                 }
             }
             else {
@@ -105,5 +107,6 @@ public abstract class AllianceTeleOP extends TeleOP {
             }
             telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
         }
+        setStripOnTarget(onTarget);
     }
 }

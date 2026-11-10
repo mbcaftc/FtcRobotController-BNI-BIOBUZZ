@@ -141,7 +141,16 @@ public class TeleOP extends OpMode{
     public double axonIncrementAmount = 0;
     
     //</editor-fold>
+    //Strip is solid green while inside the autotarget window, alliance color otherwise
+    protected boolean stripOnTarget = false;
+    public void setStripOnTarget(boolean onTarget) {
+        //Only write to the strip when it changes, I2C writes every loop slow the loop down
+        if (onTarget == stripOnTarget) return;
+        stripOnTarget = onTarget;
+        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(onTarget ? Color.GREEN : (blueTeam ? Color.BLUE : Color.RED)));
+    }
     public void autoTarget() {
+        boolean onTarget = false;
         if (gamepad2.y) {
             result = limelight.getLatestResult();
 
@@ -263,6 +272,7 @@ public class TeleOP extends OpMode{
                     // Inside target window
                     axonIncrementAmount = 0.0;
                     LEDCon(led, 4);
+                    onTarget = true;
                 }
                 telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
             }
@@ -290,6 +300,7 @@ public class TeleOP extends OpMode{
                 telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
             }
         }
+        setStripOnTarget(onTarget);
     }
     public void LEDCon(Servo LED, int color) {
         /*Set the color of the LED to one of 6 colors, 0 being off.
@@ -397,9 +408,19 @@ public class TeleOP extends OpMode{
             blueTeam = !blueTeam;
             //Switch LED strip color based on blueteam var
             LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(blueTeam ? Color.BLUE : Color.RED));
+            stripOnTarget = false;
         }
 
         if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
+    }
+    public void runLauncher(){
+        //Velocity control when on, coast down when off instead of braking the flywheel
+        if(launcherTrigger){launcherMotor.setVelocity(pollenTargetVelocity);}
+        else{launcherMotor.setPower(0);}
+
+        transferServo.setPower(transferTrigger ? 1 : 0);
+        pollenServo.setPower(transferTrigger ? -1 : 0);
+        spinNoBackServo.setPower(transferTrigger ? -1 : 0);
     }
     public void runMotors(){
         //Check if any movement inputs are greater than .2 deadzone
@@ -416,13 +437,8 @@ public class TeleOP extends OpMode{
             intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
         }
 
-        //Velocity control when on, coast down when off instead of braking the flywheel
-        if(launcherTrigger){launcherMotor.setVelocity(pollenTargetVelocity);}
-        else{launcherMotor.setPower(0);}
-
-        transferServo.setPower(transferTrigger ? 1 : 0);
-        pollenServo.setPower(transferTrigger ? -1 : 0);
-        spinNoBackServo.setPower(transferTrigger ? -1 : 0);
+        //Launcher and feed (overridden by LerpTeleOP)
+        runLauncher();
 
         //Move the transfer servo with += .1 deadzone
         double turretPower = axonIncrementAmount == 0.0 ? (Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount;
