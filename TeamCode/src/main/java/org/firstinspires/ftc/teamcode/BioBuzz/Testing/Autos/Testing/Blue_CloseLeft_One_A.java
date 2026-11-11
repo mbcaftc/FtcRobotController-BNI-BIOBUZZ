@@ -1,10 +1,13 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing;
 
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name = "Start_At_Hive_close", group = "Drive")
-public class BlueStartClose1NavDelay extends CloseHiveTipDelay{
+import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.BlueMain;
+@Disabled
+@Autonomous(name = "Blue_NearCenter_One_A", group = "Drive")
+public class Blue_CloseLeft_One_A extends BlueMain {
     @Override
     public void init(){
         //AutoMain init
@@ -12,10 +15,8 @@ public class BlueStartClose1NavDelay extends CloseHiveTipDelay{
         initHardWare();
         //Set BlueMain points (BEFORE buildConstantPaths())
         startPose = StartCloseLeft.pose();
-        nav1 = Quadrant3Center.pose();
+        shootPose = Quadrant3Back.pose();
         parkPose = ParkPoseB.pose();
-        startDelay = 10;
-        shootTime = 8.0;
         //BlueMain init
         buildPaths();
         //Start the follower

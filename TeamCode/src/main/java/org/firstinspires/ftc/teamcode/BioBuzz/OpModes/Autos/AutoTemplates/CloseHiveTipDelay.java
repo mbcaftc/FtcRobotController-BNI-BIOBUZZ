@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
+package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates;
 
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.api.Paths.path;

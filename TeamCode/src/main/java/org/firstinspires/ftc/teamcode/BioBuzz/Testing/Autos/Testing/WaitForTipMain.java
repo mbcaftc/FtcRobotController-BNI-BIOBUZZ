@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos;
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addLimelight;
 
@@ -7,7 +7,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.BlueMain;
+import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.BlueMain;
 
 import java.util.Collections;
 import java.util.List;

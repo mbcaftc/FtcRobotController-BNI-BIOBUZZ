@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.WaitForTipMain;
 
 @Autonomous(name = "WaitForTipBlue", group = "Drive")
 public class WaitForTipBlue extends WaitForTipMain {

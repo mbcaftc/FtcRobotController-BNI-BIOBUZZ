@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
+package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoPaths;
 
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.FarHiveTip;
+
 @Autonomous(name = "Start_At_Hive", group = "Drive")
-public class BlueStartFar2Nav extends FarHiveTip{
+public class BlueStartFar2Nav extends FarHiveTip {
     @Override
     public void init(){
         //AutoMain init

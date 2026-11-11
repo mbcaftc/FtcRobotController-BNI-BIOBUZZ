@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue.Testing;
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing;
 
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -9,6 +9,9 @@ import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.api.Paths.path;
 
 import com.pedropathing.paths.Path;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
+@Disabled
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
     Path start_to_park;

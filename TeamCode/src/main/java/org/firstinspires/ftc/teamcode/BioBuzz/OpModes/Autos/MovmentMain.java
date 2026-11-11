@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.UniPose;
 public class MovmentMain extends AutoMain{
     protected static final PoseFactory poseFactory = PoseFactory.degrees();
 
-    protected static UniPose StartCloseLeft = new UniPose(72, 8.8);//1
+    protected static UniPose StartCloseLeft = new UniPose(83, 8.8);//1
     protected static  UniPose StartCloseRight = new UniPose(106, 8.8);//2
     protected static  UniPose MidUnderHive = new UniPose(84, 72);//3
 

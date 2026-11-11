@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Blue;
+package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates;
 
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
