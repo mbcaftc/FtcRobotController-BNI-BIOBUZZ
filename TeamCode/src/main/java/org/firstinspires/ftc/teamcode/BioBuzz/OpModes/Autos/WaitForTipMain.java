@@ -15,6 +15,7 @@ import java.util.List;
 //Shared base for WaitForTipBlue and WaitForTipRed. Starts like PROTOTYPE_AUTO_CLOSE (delay, drive to shoot, spin up),
 //then at the shoot pose waits until it is clear to fire. Fires anyway at overrideTime. Then parks.
 //Only this alliance's tags are considered (same as AllianceTeleOP). Clear to fire:
+//  - 4 or more of the alliance's tags are seen (fireTagCount, front + back combined) -> fire
 //  - Only one of the alliance's hives is seen -> fire
 //  - Both of the alliance's hives are seen -> fire if one is higher than the other (more than levelThreshold apart)
 //No @Autonomous annotation, so it does not show up on the Driver Station by itself.
@@ -35,6 +36,8 @@ public abstract class WaitForTipMain extends BlueMain {
 
     //How far apart (meters of camera space y offset) the 2 hives have to be to count as one higher. TUNE THIS on the field.
     public double levelThreshold = 0.05;
+    //Fire if at least this many of this alliance's tags are seen (front + back combined)
+    public int fireTagCount = 4;
     //Has to be clear to fire this long before firing (filters out flickering detections)
     public double confirmSeconds = 0.5;
 
@@ -79,6 +82,11 @@ public abstract class WaitForTipMain extends BlueMain {
     }
 
     public boolean clearToFire() {
+        //Enough of this alliance's tags seen (front + back combined): fire
+        if (FTags + BTags >= fireTagCount) {
+            telemetry.addData("Clear: ", "%d %s tags seen (fire at %d)", FTags + BTags, allianceName, fireTagCount);
+            return true;
+        }
         if (FTags > 0 && BTags > 0) {
             //Both seen: fire if one is higher (lower y offset = higher hive, same as AllianceTeleOP)
             double diff = Math.abs(FYoffset - BYoffset);
