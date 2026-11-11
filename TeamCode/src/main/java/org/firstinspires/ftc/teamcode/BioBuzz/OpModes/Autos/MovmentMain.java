@@ -19,7 +19,7 @@ public class MovmentMain extends AutoMain{
     protected static final UniPose StartRightRight = new UniPose(106, 132);//7
 
     protected static final UniPose ParkPoseA = new UniPose(128, 47);//11
-    protected static final UniPose ParkPoseB = new UniPose(136, 25);//12
+    protected static final UniPose ParkPoseB = new UniPose(128, 25);//12
     protected static final UniPose LooseBallsPickup =  new UniPose(135, 133);//13
     protected static final UniPose PreLooseBallsPickup =  new UniPose(110, 133);//
     protected static final UniPose Quadrant1Center = new UniPose(108, 108);//15
@@ -61,6 +61,7 @@ public class MovmentMain extends AutoMain{
         telemetry.addData("R", follower.pose().heading());
         telemetry.addData("Current time :", " %.2f", opmodeTimer.milliseconds() / 1000.0);
         telemetry.addData("Current state :", pathState);
+        telemetry.addData("Pollen RPM: ", launcherMotor.getVelocity());
 
         //Max time breakout
         if(opmodeTimer.seconds() > maxTimeBreakout){

@@ -26,12 +26,12 @@ public class ShootFarUnderHiveBase extends MovmentMain {
 
     @Override
     public void pathLogic(){
-        if (opmodeTimer.seconds() > 10) {
+        if (opmodeTimer.seconds() > 17) {
             cutPower();
             movePath(start_to_park, pathingState.PARK);
         }
         else{
-            launch(930, 930, 3, 1);
+            launch(970, 980, 3, 1);
         }
     }
 }
