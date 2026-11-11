@@ -16,6 +16,7 @@ import java.util.List;
 //then at the shoot pose waits until it is clear to fire. Fires anyway at overrideTime. Then parks.
 //Only this alliance's tags are considered (same as AllianceTeleOP). Clear to fire:
 //  - 4 or more of the alliance's tags are seen (fireTagCount, front + back combined) -> fire
+//    (also checked during the start delay: if seen, skip the rest of the delay and fire on arrival)
 //  - Only one of the alliance's hives is seen -> fire
 //  - Both of the alliance's hives are seen -> fire if one is higher than the other (more than levelThreshold apart)
 //No @Autonomous annotation, so it does not show up on the Driver Station by itself.
@@ -48,6 +49,8 @@ public abstract class WaitForTipMain extends BlueMain {
     protected double clearStart = -1;
 
     protected boolean shooting = false;
+    //Set when enough tags were seen during the start delay: fire right away at the shoot pose
+    protected boolean fireOnArrival = false;
     protected String shootReason = "";
     protected double shootStartTime;
 
@@ -81,12 +84,15 @@ public abstract class WaitForTipMain extends BlueMain {
         telemetry.addData(allianceName + " Back: ", "Tags: %d, Yoffset: %.3f", BTags, BYoffset);
     }
 
+    //Enough of this alliance's tags seen (front + back combined)
+    public boolean enoughTags() {
+        boolean enough = FTags + BTags >= fireTagCount;
+        telemetry.addData(allianceName + " tags seen: ", "%d (fire at %d)%s", FTags + BTags, fireTagCount, enough ? " CLEAR" : "");
+        return enough;
+    }
+
     public boolean clearToFire() {
-        //Enough of this alliance's tags seen (front + back combined): fire
-        if (FTags + BTags >= fireTagCount) {
-            telemetry.addData("Clear: ", "%d %s tags seen (fire at %d)", FTags + BTags, allianceName, fireTagCount);
-            return true;
-        }
+        if (enoughTags()) return true;
         if (FTags > 0 && BTags > 0) {
             //Both seen: fire if one is higher (lower y offset = higher hive, same as AllianceTeleOP)
             double diff = Math.abs(FYoffset - BYoffset);
@@ -145,9 +151,9 @@ public abstract class WaitForTipMain extends BlueMain {
                 telemetry.addData("Waiting to fire, override in: ", "%.1f", Math.max(0, overrideTime - now));
 
                 boolean confirmed = clearStart >= 0 && now - clearStart >= confirmSeconds;
-                if (confirmed || now >= overrideTime) {
+                if (fireOnArrival || confirmed || now >= overrideTime) {
                     shooting = true;
-                    shootReason = confirmed ? "Tags" : "Override";
+                    shootReason = fireOnArrival ? fireTagCount + " tags seen before leaving" : confirmed ? "Tags" : "Override";
                     shootStartTime = now;
                     shotTimer.reset();
                 }
@@ -161,11 +167,26 @@ public abstract class WaitForTipMain extends BlueMain {
                 }
             }
         }
-        else if (now >= startDelay) {
-            //After the delay, start the first path of start_to_shoot
-            movePath(start_to_shoot, pathingState.LOOP);
-            //Spin up launcher early
-            launcherMotor.setVelocity(1100);
+        else {
+            //During the start delay, leave early if enough of this alliance's tags are seen (held for confirmSeconds)
+            if (enoughTags()) {
+                if (clearStart < 0) clearStart = now;
+            }
+            else {
+                clearStart = -1;
+            }
+            boolean tagsConfirmed = clearStart >= 0 && now - clearStart >= confirmSeconds;
+            telemetry.addData("Start delay, leaving in: ", "%.1f", Math.max(0, startDelay - now));
+
+            if (tagsConfirmed || now >= startDelay) {
+                //Tags already confirmed, so fire as soon as the robot reaches the shoot pose
+                fireOnArrival = tagsConfirmed;
+                clearStart = -1;
+                //Start the first path of start_to_shoot
+                movePath(start_to_shoot, pathingState.LOOP);
+                //Spin up launcher early
+                launcherMotor.setVelocity(1100);
+            }
         }
     }
 }
