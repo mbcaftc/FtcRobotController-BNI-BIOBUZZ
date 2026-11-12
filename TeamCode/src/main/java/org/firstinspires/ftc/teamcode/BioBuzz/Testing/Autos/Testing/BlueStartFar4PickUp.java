@@ -7,6 +7,7 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.utils.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.UniPose;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 
 //Start facing 270, shoot, back off the wall, turn sideways, slowly intake into the corner, hold it, back out, park
 //Only uses constant headings (no .linear) so the robot never turns close to a wall
+@Disabled
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
     //Far enough off the far wall that the 18in robot can turn without hitting it
