@@ -26,18 +26,21 @@ public class BlueStartFar4PickUp extends MovmentMain {
     public double sideHeading = Math.toRadians(0);//Intake side faces the loose balls
     public double intakeSpeed = 0.4;//Fraction of max path speed while intaking
     public double cornerHoldTime = 2;//Seconds to hold the corner with the intake running
+    public double shootSpeed = 960;//Launcher velocity for the opening shot
+    public double shootEndTime = 10;//Seconds after start when the opening shot stops and the robot leaves the wall
 
     enum ScoringState {SHOOTING, OFF_WALL, TURN, TO_PICKUP, INTO_CORNER, HOLD_CORNER, BACK_OUT, PARK}
     ScoringState currentState = ScoringState.SHOOTING;
 
-    Path offWall;
-    Path turnSideways;
-    Path toPickup;
-    Path intoCorner;
-    Path backOut;
-    Pose cornerPose;
-    Timer holdTimer = new Timer();
-    Path park;
+    //Protected so autos that extend this one (FarCheckHive) can reuse the same paths
+    protected Path offWall;
+    protected Path turnSideways;
+    protected Path toPickup;
+    protected Path intoCorner;
+    protected Path backOut;
+    protected Pose cornerPose;
+    protected Timer holdTimer = new Timer();
+    protected Path park;
 
     @Override
     public void init(){
@@ -85,8 +88,8 @@ public class BlueStartFar4PickUp extends MovmentMain {
     public void pathLogic(){
         switch(currentState){
             case SHOOTING:
-                launch(960, 1225, 3, 1);
-                if (opmodeTimer.seconds() > 10) {
+                launch(shootSpeed, 1225, 3, 1);
+                if (opmodeTimer.seconds() > shootEndTime) {
                     cutPower();
                     currentState = ScoringState.OFF_WALL;
                     movePath(offWall, pathingState.LOOP);
