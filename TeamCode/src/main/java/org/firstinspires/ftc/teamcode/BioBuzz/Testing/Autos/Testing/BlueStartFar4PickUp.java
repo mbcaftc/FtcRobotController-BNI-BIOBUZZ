@@ -26,7 +26,7 @@ public class BlueStartFar4PickUp extends MovmentMain {
     public double sideHeading = Math.toRadians(0);//Intake side faces the loose balls
     public double intakeSpeed = 0.4;//Fraction of max path speed while intaking
     public double cornerHoldTime = 2;//Seconds to hold the corner with the intake running
-    public double shootSpeed = 960;//Launcher velocity for the opening shot
+    public double shootSpeed = 970;//Launcher velocity for the opening shot
     public double shootEndTime = 10;//Seconds after start when the opening shot stops and the robot leaves the wall
 
     enum ScoringState {SHOOTING, OFF_WALL, TURN, TO_PICKUP, INTO_CORNER, HOLD_CORNER, BACK_OUT, PARK}
@@ -88,7 +88,7 @@ public class BlueStartFar4PickUp extends MovmentMain {
     public void pathLogic(){
         switch(currentState){
             case SHOOTING:
-                launch(shootSpeed, 1225, 3, 1);
+                launch(shootSpeed, 980, 3, 1);
                 if (opmodeTimer.seconds() > shootEndTime) {
                     cutPower();
                     currentState = ScoringState.OFF_WALL;

@@ -151,7 +151,7 @@ public class FarCheckHive extends BlueStartFar4PickUp {
         switch (state) {
             //---- Same as BlueStartFar4PickUp ----
             case SHOOTING:
-                launch(shootSpeed, 1225, 3, 1);
+                launch(shootSpeed, 980, 3, 1);
                 if (now > shootEndTime) {
                     cutPower();
                     state = CheckState.OFF_WALL;
