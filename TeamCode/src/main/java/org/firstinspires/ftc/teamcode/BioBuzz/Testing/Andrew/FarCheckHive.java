@@ -37,6 +37,10 @@ public class FarCheckHive extends BlueStartFar4PickUp {
     public double secondShootDuration = 5;//Seconds to shoot the corner pollen for
     public double turnTolerance = Math.toRadians(5);//Close enough to the turned heading to start shooting
     public double maxTurnTime = 2.5;//Shoot anyway if the turn hasn't settled by then
+    public double intakePathTimeout = 1;//Seconds before the slow drive into the corner gives up and starts the corner hold
+    //Failsafe park time for this auto only (MovmentMain default is 25). Late so the second shot isn't cut off,
+    //and pushed back again once the second shot starts so it always gets its full secondShootDuration
+    public double failsafeTime = 29;
 
     enum CheckState {SHOOTING, OFF_WALL, TURN_SIDEWAYS, TO_PICKUP, INTO_CORNER, HOLD_CORNER, BACK_OUT,
         RETURN_TURN_POINT, RETURN_OFF_WALL, RETURN_START, CHECK, SHOOT_START, DRIVE_UNDER, TURN_AROUND, SHOOT_UNDER, DONE}
@@ -61,8 +65,9 @@ public class FarCheckHive extends BlueStartFar4PickUp {
         super.init();
         limelight = addLimelight(hardwareMap, "LL");
         //Shorter than the 4 pickup so there is time left to check and shoot again
-        shootEndTime = 6;//4 pickup: 10
+        shootEndTime = 9;//4 pickup: 10
         cornerHoldTime = 1;//4 pickup: 2
+        maxTimeBreakout = failsafeTime;
 
         Pose start = StartFarLeft.pose();
         Pose offWallPose = OffWall.pose();
@@ -106,6 +111,12 @@ public class FarCheckHive extends BlueStartFar4PickUp {
         //Read the hive every loop, MovmentMain.loop() sends the telemetry
         readHives();
         telemetry.addData("Check state: ", state);
+        //Intake path breakout: if the slow drive into the corner (state INTO_CORNER while following) takes longer than
+        //intakePathTimeout, stop waiting on it and go straight to the corner hold. pathTimer resets when the path starts
+        if (state == CheckState.INTO_CORNER && pathState == pathingState.RETURNMOVETOPOINT && pathTimer.seconds() > intakePathTimeout) {
+            pathState = returnState;
+            telemetry.addLine("Intake path timed out, holding corner");
+        }
         super.loop();
     }
 
@@ -121,6 +132,11 @@ public class FarCheckHive extends BlueStartFar4PickUp {
             }
         }
         telemetry.addData("Blue hive tags seen: ", blueTags);
+    }
+
+    //Called when the second shot starts: push the failsafe past the end of the shot so it can't cut the shot short
+    public void keepFailsafeClear(double now){
+        maxTimeBreakout = Math.max(maxTimeBreakout, now + secondShootDuration + 0.5);
     }
 
     //Shortest angle between two headings in radians
@@ -200,6 +216,7 @@ public class FarCheckHive extends BlueStartFar4PickUp {
                 }
                 if (seenStart >= 0 && now - seenStart >= confirmSeconds) {
                     stateStart = now;
+                    keepFailsafeClear(now);
                     state = CheckState.SHOOT_START;
                 }
                 else if (now - stateStart > checkTime) {
@@ -228,6 +245,7 @@ public class FarCheckHive extends BlueStartFar4PickUp {
                 telemetry.addData("Turn error (deg): ", "%.1f", Math.toDegrees(error));
                 if (error < turnTolerance || now - stateStart > maxTurnTime) {
                     stateStart = now;
+                    keepFailsafeClear(now);
                     state = CheckState.SHOOT_UNDER;
                 }
                 break;
