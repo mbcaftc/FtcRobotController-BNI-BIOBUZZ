@@ -32,7 +32,7 @@ public class FarHiveTip extends MovmentMain {
 
     @Override
     public void pathLogic(){
-        launch(960, 980, 3, 1);
+        launch(960, 970, 3, 1);
         if (opmodeTimer.seconds() > 10) {
             cutPower();
             movePath(start_to_park, pathingState.PARK);

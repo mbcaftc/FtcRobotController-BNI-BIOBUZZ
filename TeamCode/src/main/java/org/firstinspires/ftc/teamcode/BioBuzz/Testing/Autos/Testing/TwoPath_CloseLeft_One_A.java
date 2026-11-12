@@ -4,10 +4,10 @@ import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.BlueMain;
+import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.TwoPathMain;
 @Disabled
 @Autonomous(name = "Blue_NearCenter_One_A", group = "Drive")
-public class Blue_CloseLeft_One_A extends BlueMain {
+public class TwoPath_CloseLeft_One_A extends TwoPathMain {
     @Override
     public void init(){
         //AutoMain init

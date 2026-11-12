@@ -5,7 +5,7 @@ import com.pedropathing.paths.Path;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 
-public class BlueMain extends MovmentMain {
+public class TwoPathMain extends MovmentMain {
     public Pose startPose;
     public Pose shootPose;
 

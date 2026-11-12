@@ -7,7 +7,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.BlueMain;
+import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.TwoPathMain;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 //  - Only one of the alliance's hives is seen -> fire
 //  - Both of the alliance's hives are seen -> fire if one is higher than the other (more than levelThreshold apart)
 //No @Autonomous annotation, so it does not show up on the Driver Station by itself.
-public abstract class WaitForTipMain extends BlueMain {
+public abstract class WaitForTipMain extends TwoPathMain {
     //April Tag ID ranges for this alliance's hives (set by WaitForTipBlue / WaitForTipRed), same as AllianceTeleOP
     protected String allianceName;
     protected int frontMinId, frontMaxId;

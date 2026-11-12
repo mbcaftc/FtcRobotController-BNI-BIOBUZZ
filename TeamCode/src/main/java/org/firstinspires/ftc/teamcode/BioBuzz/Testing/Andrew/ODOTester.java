@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-@Disabled
+
 @TeleOp(name = "Pinpoint Diagnostic Test", group = "Diagnostics")
 public class ODOTester extends LinearOpMode {
 
