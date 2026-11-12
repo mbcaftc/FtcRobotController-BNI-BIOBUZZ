@@ -102,7 +102,7 @@ public class BlueStartFar4PickUp extends MovmentMain {
                 break;
             case TO_PICKUP:
                 //Intake stays on from here until the robot has backed out of the corner
-                intake(1);
+                intake(-1);
                 currentState = ScoringState.INTO_CORNER;
                 movePath(intoCorner, pathingState.LOOP);
                 break;
