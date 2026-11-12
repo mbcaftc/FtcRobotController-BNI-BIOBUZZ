@@ -12,7 +12,6 @@ public class ShootFarUnderHiveBase extends MovmentMain {
     public Pose startPose;
     public Pose nav1;
     public Pose nav2;
-    public Pose parkPose;
 
     public Path start_to_park;
 

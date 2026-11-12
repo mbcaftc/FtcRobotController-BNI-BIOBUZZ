@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoPaths;
 
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.CloseHiveTipDelay;
 
+@Disabled
 @Autonomous(name = "Start_At_Hive_close", group = "Drive")
 public class BlueStartClose1NavDelay extends CloseHiveTipDelay {
     @Override

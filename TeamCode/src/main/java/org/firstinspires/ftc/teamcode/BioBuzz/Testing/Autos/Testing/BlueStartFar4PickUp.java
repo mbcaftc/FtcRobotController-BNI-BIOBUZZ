@@ -1,80 +1,130 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing;
 
-import com.pedropathing.math.Pose;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
-
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.api.Paths.path;
 
+import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.pedropathing.utils.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Disabled
+import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
+import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.UniPose;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
+
+//Start facing 270, shoot, back off the wall, turn sideways, slowly intake into the corner, hold it, back out, park
+//Only uses constant headings (no .linear) so the robot never turns close to a wall
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
-    Path start_to_park;
-    ScoringState CurrentState;
-    enum ScoringState {
-        Waiting,
-        Shooting,
-        GoingToPickUp,
-        Pickup,
-        Park
-    }
+    //Far enough off the far wall that the 18in robot can turn without hitting it
+    //x of 85 or more keeps the corners from crossing the centerline (x 72) during the turn
+    protected static final UniPose OffWall = new UniPose(86, 114);
+    //Short sideways move where the robot turns from 270 to 0
+    protected static final UniPose TurnPoint = new UniPose(95, 114);
 
-    Path prePickup;
-    Path Pickup;
-    Path Park;
+    public double startHeading = Math.toRadians(270);
+    public double sideHeading = Math.toRadians(0);//Intake side faces the loose balls
+    public double intakeSpeed = 0.4;//Fraction of max path speed while intaking
+    public double cornerHoldTime = 2;//Seconds to hold the corner with the intake running
+
+    enum ScoringState {SHOOTING, OFF_WALL, TURN, TO_PICKUP, INTO_CORNER, HOLD_CORNER, BACK_OUT, PARK}
+    ScoringState currentState = ScoringState.SHOOTING;
+
+    Path offWall;
+    Path turnSideways;
+    Path toPickup;
+    Path intoCorner;
+    Path backOut;
+    Pose cornerPose;
+    Timer holdTimer = new Timer();
+    Path park;
 
     @Override
     public void init(){
         //AutoMain init
         setup();
         initHardWare();
-        //Set BlueMain points (BEFORE buildConstantPaths())
 
-        //pre PickUp
-        prePickup = buildConstantPaths(StartFarLeft.pose(), PreLooseBallsPickup.pose());
-        //PickUp
-        Pickup = buildConstantPaths(PreLooseBallsPickup.pose(), LooseBallsPickup.pose(), PreLooseBallsPickup.pose());
-        //park
-        Park = buildConstantPaths(PreLooseBallsPickup.pose(), Quadrant1Center.setDeg(90), ParkPoseA.setDeg(180));
+        Pose start = StartFarLeft.pose();
+        Pose offWallPose = OffWall.pose();
+        Pose turnPose = TurnPoint.pose();
+        Pose prePickup = PreLooseBallsPickup.pose();
+        Pose loose = LooseBallsPickup.pose();
+        Pose q1 = Quadrant1Center.pose();
+        parkPose = ParkPoseA.pose();//Also used by the failsafe park
+
+        //Straight off the wall, still facing 270
+        offWall = path(line(start, offWallPose)).constant(startHeading);
+        //Short slide while turning to 0, away from the wall
+        turnSideways = path(line(offWallPose, turnPose)).constant(sideHeading);
+        //Line up in front of the loose balls
+        toPickup = path(line(turnPose, prePickup)).constant(sideHeading);
+        //Drive slowly into the loose balls and back out with the intake on
+        //maxPathSpeed.at() caps the speed for just this path
+        cornerPose = new Pose(loose.x(), loose.y(), sideHeading);
+        intoCorner = path(line(prePickup, loose)).constant(sideHeading)
+                .with(MainConstants.foresightConfig.maxPathSpeed.at(intakeSpeed));
+        backOut = path(line(loose, prePickup)).constant(sideHeading)
+                .with(MainConstants.foresightConfig.maxPathSpeed.at(intakeSpeed));
+        //Park, keep facing sideways so it never turns
+        park = path(line(prePickup, q1), line(q1, parkPose)).constant(sideHeading);
+
         //Start the follower
-
-
-        follower.setPose(StartFarLeft.pose());
+        follower.setPose(new Pose(start.x(), start.y(), startHeading));
         follower.update();
-        CurrentState = ScoringState.Waiting;//Waiting nothing is happening started in start
     }
+
     @Override
     public void start(){
-        CurrentState = ScoringState.Shooting;//Begins shooting
+        super.start();//Reset timers so time spent in init doesn't count
+        currentState = ScoringState.SHOOTING;
     }
+
+    //pathLogic only runs in the LOOP state, so each case starts after the previous path has finished
     @Override
     public void pathLogic(){
-        switch(CurrentState){
-            case Waiting:
-                break;
-            case Shooting:
+        switch(currentState){
+            case SHOOTING:
                 launch(960, 1225, 3, 1);
-                if (opmodeTimer.seconds() > 10) CurrentState = ScoringState.GoingToPickUp;
+                if (opmodeTimer.seconds() > 10) {
+                    cutPower();
+                    currentState = ScoringState.OFF_WALL;
+                    movePath(offWall, pathingState.LOOP);
+                }
                 break;
-            case GoingToPickUp:
-                cutPower();
-                movePath(prePickup, pathingState.LOOP);
-                CurrentState = ScoringState.GoingToPickUp;
+            case OFF_WALL:
+                currentState = ScoringState.TURN;
+                movePath(turnSideways, pathingState.LOOP);
                 break;
-            case Pickup:
+            case TURN:
+                currentState = ScoringState.TO_PICKUP;
+                movePath(toPickup, pathingState.LOOP);
+                break;
+            case TO_PICKUP:
+                //Intake stays on from here until the robot has backed out of the corner
                 intake(1);
-                movePath(Pickup, pathingState.LOOP);
-                intake(0);
-                CurrentState = ScoringState.Park;
+                currentState = ScoringState.INTO_CORNER;
+                movePath(intoCorner, pathingState.LOOP);
                 break;
-            case Park:
-                movePath(Park, pathingState.PARK);
+            case INTO_CORNER:
+                //In the corner, hold the pose while the intake runs
+                follower.hold(cornerPose);
+                holdTimer.reset();
+                currentState = ScoringState.HOLD_CORNER;
+                break;
+            case HOLD_CORNER:
+                if (holdTimer.seconds() > cornerHoldTime) {
+                    currentState = ScoringState.BACK_OUT;
+                    movePath(backOut, pathingState.LOOP);
+                }
+                break;
+            case BACK_OUT:
+                intake(0);
+                currentState = ScoringState.PARK;
+                movePath(park, pathingState.PARK);
+                break;
+            case PARK:
+                break;
         }
     }
 }
-

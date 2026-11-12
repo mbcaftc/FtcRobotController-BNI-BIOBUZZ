@@ -14,7 +14,6 @@ public class AndewFarHiveTip extends MovmentMain {
     public Pose startPose;
     public Pose nav1;
     public Pose nav2;
-    public Pose parkPose;
 
     public Path start_to_park;
 
@@ -28,7 +27,7 @@ public class AndewFarHiveTip extends MovmentMain {
 
     @Override
     public void pathLogic(){
-        launch(930, 930, 3, 1);
+        launch(960, 980, 3, 1);
         if (opmodeTimer.seconds() > 10) {
             cutPower();
             movePath(start_to_park, pathingState.PARK);

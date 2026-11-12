@@ -91,7 +91,7 @@ public class TeleOP extends OpMode{
     double maxTurretPower = 0.35;
     double turretDirection = -1; // flip to -1 if it turns away from the tag
     double turretHeadingSign = 1; // flip to -1 if recentering turns away from center (1 = positive power increases heading)
-    double maxTurretAngle = 90;  // degrees either side of center the turret is allowed to go
+    double maxTurretAngle = 75;  // degrees either side of center the turret is allowed to go
 
 
     //</editor-fold>
@@ -412,6 +412,14 @@ public class TeleOP extends OpMode{
         }
 
         if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
+
+        //Zero the turret, wherever it is now becomes 0 degrees
+        if(gamepad2.rightStickButtonWasPressed()){
+            totalAxonTravel = 0;
+            turretCurrentHeading = 0;
+            //Restart rollover tracking from the current encoder reading so the next calcTurretPos() doesn't jump
+            pastAxonPosition = (axonFeedback.getVoltage() / 3.3) * 360;
+        }
     }
     public void runLauncher(){
         //Velocity control when on, coast down when off instead of braking the flywheel

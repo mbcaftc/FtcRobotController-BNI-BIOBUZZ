@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos;
 
+import static com.pedropathing.api.Paths.line;
+import static com.pedropathing.api.Paths.path;
+
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
@@ -16,6 +19,7 @@ public class MovmentMain extends AutoMain{
     protected static  UniPose MidAroundCloseHive = new UniPose(84, 72);//this is close to flower//4
     protected static  UniPose MidAroundCloseHumans = new UniPose (124, 72 );//this is close to humans//5
     protected static  UniPose StartFarLeft = new UniPose(83, 132);//6
+    protected static final UniPose StartFarLeftTileRight = new UniPose(107, 132);//StartFarLeft moved one tile (24 in) right
     protected static final UniPose StartRightRight = new UniPose(106, 132);//7
 
     protected static final UniPose ParkPoseA = new UniPose(128, 47);//11
@@ -39,6 +43,9 @@ public class MovmentMain extends AutoMain{
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
     public double maxTimeBreakout = 25;
+    //Where the auto parks, set it in init() so the failsafe can drive here
+    public Pose parkPose;
+    public boolean failsafeTriggered = false;
 
     //set up simple states
     public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END, LOOP}
@@ -63,12 +70,30 @@ public class MovmentMain extends AutoMain{
         telemetry.addData("Current state :", pathState);
         telemetry.addData("Pollen RPM: ", launcherMotor.getVelocity());
 
-        //Max time breakout
-        if(opmodeTimer.seconds() > maxTimeBreakout){
-            if(pathState != pathingState.END){
-                telemetry.addLine("EMERGENCY BREAKOUT. PARKING.");
-                pathState = pathingState.PARK;
+        //Max time breakout, runs once and drives straight to parkPose unless the auto is already parking
+        if(opmodeTimer.seconds() > maxTimeBreakout && !failsafeTriggered){
+            failsafeTriggered = true;
+            //pathLogic stops running after this, so don't leave the CR turret spinning at its last power
+            turretServo.setPower(0);
+            boolean alreadyParking = pathState == pathingState.PARK || pathState == pathingState.END
+                    || ((pathState == pathingState.MOVETOPOINT || pathState == pathingState.RETURNMOVETOPOINT)
+                        && returnState == pathingState.PARK);
+            if(!alreadyParking){
+                cutPower();
+                if(parkPose != null){
+                    Pose here = follower.pose();
+                    //Hold the current heading (no .linear) so it doesn't turn near walls on the way
+                    Path failsafePark = path(line(new Pose(here.x(), here.y()), new Pose(parkPose.x(), parkPose.y())))
+                            .constant(here.heading());
+                    movePath(failsafePark, pathingState.PARK);
+                }
+                else{
+                    pathState = pathingState.PARK;
+                }
             }
+        }
+        if(failsafeTriggered){
+            telemetry.addLine("FAILSAFE: PARKING.");
         }
 
         switch (pathState) {

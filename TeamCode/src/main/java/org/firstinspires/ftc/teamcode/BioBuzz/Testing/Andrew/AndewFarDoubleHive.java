@@ -14,7 +14,6 @@ public class AndewFarDoubleHive extends MovmentMain {
     public Pose nav2;
     public Pose shootingPose;
     public Pose nav3;
-    public Pose parkPose;
 
     public Path start_to_nav2;
     public Path nav2_to_shoot;
@@ -33,35 +32,12 @@ public class AndewFarDoubleHive extends MovmentMain {
         telemetry.update();
     }
 
-    //TESTING ONLY: hold gamepad1 A during auto to force feeding, ignores the velocity gate in launch()
-    protected boolean testFeeding = false;
-
-    public void setFeed(double power){
-        transferServo.setPower(power);
-        pollenServo.setPower(-power);
-        spinNoBackServo.setPower(-power);
-        intakeMotor.setPower(-power);
-        intakeMotorTwo.setPower(-power);
-    }
-
     @Override
     public void loop(){
         //MovmentMain.loop() sends the telemetry
         telemetry.addData("Launch Velocity: ", "%.0f", launchVelocity);
         telemetry.addData("Launcher Actual: ", "%.0f", launcherMotor.getVelocity());
-        telemetry.addData("Test Feed (gamepad1 A): ", gamepad1.a ? "FEEDING" : "off");
         super.loop();
-
-        //Runs after pathLogic so it overrides launch() turning the feed off
-        if(gamepad1.a){
-            setFeed(1);
-            testFeeding = true;
-        }
-        else if(testFeeding){
-            //Just let go: stop feeding, launch() takes back over next loop if it is in a shooting phase
-            setFeed(0);
-            testFeeding = false;
-        }
     }
 
     public void buildPaths(){

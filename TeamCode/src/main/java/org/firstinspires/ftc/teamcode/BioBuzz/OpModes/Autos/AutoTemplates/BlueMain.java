@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 public class BlueMain extends MovmentMain {
     public Pose startPose;
     public Pose shootPose;
-    public Pose parkPose;
 
     public Path start_to_shoot;
     public Path shoot_to_park;

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "ShootFarUnderHive", group = "Debug")
+@Autonomous(name = "ShootFarUnderHive", group = "Drive")
 public class ShootFarUnderHive extends ShootFarUnderHiveBase {
     @Override
     public void init(){

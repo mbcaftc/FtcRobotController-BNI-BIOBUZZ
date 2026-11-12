@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 public class CloseHiveTipDelay extends MovmentMain {
     public Pose startPose;
     public Pose nav1;
-    public Pose parkPose;
 
     public Path start_to_park;
     public double startDelay;
