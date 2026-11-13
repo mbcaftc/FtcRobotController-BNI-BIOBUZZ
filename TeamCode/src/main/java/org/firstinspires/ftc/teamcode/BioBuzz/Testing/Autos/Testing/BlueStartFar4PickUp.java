@@ -18,18 +18,17 @@ import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 @Disabled
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
-    //Far enough off the far wall that the 18in robot can turn without hitting it
-    //x of 85 or more keeps the corners from crossing the centerline (x 72) during the turn
+
     protected static final UniPose OffWall = new UniPose(86, 114);
     //Short sideways move where the robot turns from 270 to 0
     protected static final UniPose TurnPoint = new UniPose(95, 114);
 
     public double startHeading = Math.toRadians(270);
     public double sideHeading = Math.toRadians(0);//Intake side faces the loose balls
-    public double intakeSpeed = 0.4;//Fraction of max path speed while intaking
+    public double intakeSpeed = 0.3;//Fraction of max path speed while intaking
     public double cornerHoldTime = 2;//Seconds to hold the corner with the intake running
-    public double shootSpeed = 970;//Launcher velocity for the opening shot
-    public double shootEndTime = 10;//Seconds after start when the opening shot stops and the robot leaves the wall
+    public double shootSpeed = 1030;//Launcher velocity for the opening shot
+    public double shootEndTime = 9;//Seconds after start when the opening shot stops and the robot leaves the wall
 
     enum ScoringState {SHOOTING, OFF_WALL, TURN, TO_PICKUP, INTO_CORNER, HOLD_CORNER, BACK_OUT, PARK}
     ScoringState currentState = ScoringState.SHOOTING;

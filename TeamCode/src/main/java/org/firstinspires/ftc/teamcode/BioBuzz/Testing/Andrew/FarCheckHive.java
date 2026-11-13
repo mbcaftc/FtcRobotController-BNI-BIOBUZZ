@@ -183,7 +183,7 @@ public class FarCheckHive extends BlueStartFar4PickUp {
         switch (state) {
             //---- Same as BlueStartFar4PickUp ----
             case SHOOTING:
-                launch(shootSpeed, 980, 3, 1);
+                launch(shootSpeed, 1030, 3, 1);
                 if (now > shootEndTime) {
                     //Stop feeding but keep the flywheel at speed through the pickup for the second shot
                     stopFeed();

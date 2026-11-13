@@ -135,7 +135,7 @@ public class TeleOP extends OpMode{
     boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 930;
+    public double pollenTargetVelocity = 1015;
     public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
     public double axonIncrementAmount = 0;
@@ -436,13 +436,13 @@ public class TeleOP extends OpMode{
             //Apply motor power based on established triggers from inputHandling(), add dampening
             double intakeDirection = gamepad1.left_bumper ? .6 : -.6;
             intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
-            intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
+            //intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
         }
         else {
             //Apply motor power based on established triggers from inputHandling()
             int intakeDirection = gamepad1.left_bumper ? 1 : -1;
             intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
-            intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
+            //intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
         }
 
         //Launcher and feed (overridden by LerpTeleOP)
@@ -476,7 +476,7 @@ public class TeleOP extends OpMode{
 
         //Extra Motors
         intakeMotor = addMotor(hardwareMap, "intake", true, true);
-        intakeMotorTwo= addMotor(hardwareMap, "intakeTwo", true, true);
+        //intakeMotorTwo= addMotor(hardwareMap, "intakeTwo", true, true);
         launcherMotor = addMotorEx(hardwareMap, "launcher", true, false, true);//Float so the flywheel coasts
 
         //Init servos
