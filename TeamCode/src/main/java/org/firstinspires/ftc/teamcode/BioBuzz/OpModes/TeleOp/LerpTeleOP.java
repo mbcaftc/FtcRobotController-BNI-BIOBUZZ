@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //    While held, the target velocity ramps from initial up to initial + rampAmount over rampTime to make up for the speed lost per shot
 //  - Let go of A: stop feeding and let the flywheel coast back down to the initial velocity (no active braking, so it doesn't undershoot)
 //LED: green = can feed, red = can't feed (launcher off, spinning up, or slowing back down)
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "LerpTeleOP", group = "Drive")
 public class LerpTeleOP extends TeleOP {
     //<editor-fold desc="Lerp Firing Variables">
