@@ -135,10 +135,12 @@ public class TeleOP extends OpMode{
     boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 1015;
+    public double pollenTargetVelocity = 1080;
     public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
     public double axonIncrementAmount = 0;
+
+    public boolean useVelocity = true;
     
     //</editor-fold>
     //Strip is solid green while inside the autotarget window, alliance color otherwise
@@ -370,6 +372,7 @@ public class TeleOP extends OpMode{
         telemetry.addData("BR", BackRight.getPower());
         telemetry.addData("BL", BackLeft.getPower());
         telemetry.addData("Flower Percent: ", flowerHeight);
+        if(!useVelocity){telemetry.addData("Current Power: ", launcherMotor.getPower());}
         telemetry.update();
     }
     public void calcTurretPos(){
@@ -402,6 +405,9 @@ public class TeleOP extends OpMode{
         if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
         if(gamepad2.dpadLeftWasPressed()){flowerHeight -= .01;}
         if(gamepad2.dpadRightWasPressed()){flowerHeight += .01;}
+
+        if(gamepad2.rightBumperWasPressed()){useVelocity = !useVelocity;}
+
         if(gamepad1.xWasPressed()){config1 = !config1;}
 
         if(gamepad1.dpadUpWasPressed()){
@@ -423,7 +429,15 @@ public class TeleOP extends OpMode{
     }
     public void runLauncher(){
         //Velocity control when on, coast down when off instead of braking the flywheel
-        if(launcherTrigger){launcherMotor.setVelocity(pollenTargetVelocity);}
+        if(launcherTrigger){
+            if(useVelocity) {
+                launcherMotor.setVelocity(pollenTargetVelocity);
+            }
+            else{
+                launcherMotor.setPower(.8f);
+                LEDCon(led, 2);
+            }
+        }
         else{launcherMotor.setPower(0);}
 
         transferServo.setPower(transferTrigger ? 1 : 0);

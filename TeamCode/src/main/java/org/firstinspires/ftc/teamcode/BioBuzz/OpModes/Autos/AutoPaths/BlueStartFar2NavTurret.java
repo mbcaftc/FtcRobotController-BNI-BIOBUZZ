@@ -38,7 +38,7 @@ public class BlueStartFar2NavTurret extends FarHiveTip {
             case SHOOTING:
                 //Turn the turret while the launcher spins up
                 setTurretHeading(turretTarget);
-                launch(1010, 1030, 3, 1);
+                launch(1080, 1080, 3, 1);
                 if (opmodeTimer.seconds() > 10) {
                     cutPower();
                     //CRServo keeps its last power, so stop it before driving
