@@ -116,6 +116,7 @@ public void init(){}//do not add anything needed for opmode to compile
     public void launch(double laucnhSpeed, double maxSpeed, double time, double servoPower){
         //Lerp for the velocity speed over launchtime (current time since first passing velocity gate / maxTime) (This is not AI, this is MEEEE)
         //launcherMotor.setVelocity(laucnhSpeed + (maxSpeed - laucnhSpeed) * Math.clamp(shotTimer.seconds() / time, 0, 1));
+        laucnhSpeed = 970;
         launcherMotor.setVelocity(laucnhSpeed);
         //Launch over minimum velocity
         if(launcherMotor.getVelocity() > laucnhSpeed - 50) {

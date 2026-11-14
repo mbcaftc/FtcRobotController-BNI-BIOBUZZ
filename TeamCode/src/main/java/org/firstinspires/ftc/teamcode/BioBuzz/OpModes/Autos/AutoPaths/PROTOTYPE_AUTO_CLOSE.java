@@ -16,7 +16,7 @@ public class PROTOTYPE_AUTO_CLOSE extends TwoPathMain {
     public void pathLogic(){
         //If done with the shooting path, go to the parking position and stop the loop by handing off to the park state.
         if (moveToPointChain.equals(start_to_shoot)) {
-            launch(1050, 1500, 3, 1);
+            launch(1070, 1100, 3, 1);
             if (opmodeTimer.seconds() > startDelay + 10) {
                 cutPower();
                 movePath(shoot_to_park, pathingState.PARK);

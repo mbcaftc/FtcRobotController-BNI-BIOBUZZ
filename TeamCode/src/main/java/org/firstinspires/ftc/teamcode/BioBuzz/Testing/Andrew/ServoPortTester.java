@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoController;
@@ -20,6 +21,7 @@ import java.util.List;
  *   X                - sweep ALL ports together 0 -> 1 -> 0
  *   Back             - switch hub (if the default pick is wrong)
  */
+@Disabled
 @TeleOp(name = "Servo Port Tester", group = "Debug")
 public class ServoPortTester extends OpMode {
 

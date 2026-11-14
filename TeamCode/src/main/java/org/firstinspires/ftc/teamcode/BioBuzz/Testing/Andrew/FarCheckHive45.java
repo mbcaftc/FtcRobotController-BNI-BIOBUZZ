@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 //Same as Far_Check_Hive, but starts turned 45 degrees toward the corner pollen (facing 315 instead of 270)
 //so the turn to pick up is only 45 degrees. The turret turns to aim at the hive during the opening shot,
 //then goes back to straight ahead for the rest of the auto.
 //The turret must start straight ahead (0) at init, same as Start_At_Hive_Right.
+@Disabled
 @Autonomous(name = "Far_Check_Hive_45", group = "Debug")
 public class FarCheckHive45 extends FarCheckHive {
     //Robot is 17in front to back, 15in side to side. Facing 315, the corners sit at (+-11.31, -+0.71) and (-+0.71, +-11.31)

@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations
 
 import java.util.Collections;
 import java.util.List;
-
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TesterTeleOP", group = "Debug")
 public class SimpleTeleOP extends OpMode{
     public SimpleTeleOP() {}

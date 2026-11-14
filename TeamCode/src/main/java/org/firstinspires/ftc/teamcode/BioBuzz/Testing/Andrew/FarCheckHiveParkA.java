@@ -1,0 +1,322 @@
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
+
+import static com.pedropathing.api.Paths.line;
+import static com.pedropathing.api.Paths.path;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addLimelight;
+
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing.BlueStartFar4PickUp;
+import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
+
+import java.util.Collections;
+import java.util.List;
+
+// hi Andrew i better at coding from Walter
+//Runs the 4 pickup auto (shoot from StartFarLeft, intake the corner pollen), then drives back to the start pose and checks for a front hive (red or blue)
+//  - Tags seen: shoot from the start pose, then follow the ShootFarUnderHive path to park
+//  - No tags: drive under the hive, turn around in place to face it (90), shoot, then park
+//Reuses BlueStartFar4PickUp's paths and settings, so tuning that auto also tunes this one
+@Autonomous(name = "Far_Check_Hive_ParkA", group = "Debug")
+public class FarCheckHiveParkA extends BlueStartFar4PickUp {
+    //Front hive April Tag IDs for both alliances (same as RedTeleOP / BlueTeleOP). Back hive tags (red 30-33, blue 42-45) are ignored
+    public int redFrontMinId = 34, redFrontMaxId = 37;
+    public int blueFrontMinId = 38, blueFrontMaxId = 41;
+
+    //Where the robot stops past the hive and turns around. x of 85 or more keeps the corners off the centerline (x 72) while turning. TUNE ON THE FIELD
+    protected static final UniPose UnderShotPoint = new UniPose(86, 24);
+
+    public double turnedHeading = Math.toRadians(90);//Facing back toward the hive after driving under it
+
+    public double checkTime = 1;//Seconds at the start pose to look for a front hive before driving under
+    public double confirmSeconds = 0.5;//Tags have to be seen this long in a row (filters out flicker)
+    public double secondShootSpeed = 960;//Launcher velocity for the second shot (same as Start_At_Hive / FarHiveTip)
+    public double secondShootDuration = 5.5;//Seconds to shoot the corner pollen for
+    public double secondSpinUpTime = 1;//Seconds holding the flywheel at speed before feeding on the second shot (adds to secondShootDuration)
+    public double pickupShiftY = 1.5;//Ball approach poses (PreLooseBallsPickup, LooseBallsPickup) moved this far up (+y, toward the far wall)
+    public double turnTolerance = Math.toRadians(5);//Close enough to the turned heading to start shooting
+    public double maxTurnTime = 2.5;//Shoot anyway if the turn hasn't settled by then
+    public double intakePathTimeout = 1;//Seconds before the slow drive into the corner gives up and starts the corner hold
+    //The turning slides (turnSideways out, toOffWall back) move on once the heading is this close, instead of waiting
+    //for the follower to fully settle (that wait was taking ~4 s). The next path keeps correcting the heading
+    public double turnPathTolerance = Math.toRadians(10);
+    public double maxTurnPathTime = 1.5;//Move on from a turning slide after this long no matter what
+
+    //Opening pose, FarCheckHive45 changes these. Default is the 4 pickup start: StartFarLeft facing 270
+    protected UniPose openingStart = StartFarLeft;
+    protected double openingHeading = Math.toRadians(270);
+    //Turret aim during the opening shot (degrees, negative is clockwise). Only used when aimTurret is true;
+    //after the opening shot the turret goes back to 0 (straight ahead)
+    protected boolean aimTurret = false;
+    protected double openingTurretTarget = 0;
+
+    enum CheckState {SHOOTING, OFF_WALL, TURN_SIDEWAYS, TO_PICKUP, INTO_CORNER, HOLD_CORNER, BACK_OUT,
+        RETURN_TURN_POINT, RETURN_OFF_WALL, RETURN_START, CHECK, SHOOT_START, DRIVE_UNDER, TURN_AROUND, SHOOT_UNDER, DONE}
+    CheckState state = CheckState.SHOOTING;
+
+    protected Limelight3A limelight;
+    protected int hiveTags;//Red + blue front hive tags seen this loop
+    protected double seenStart = -1;
+    protected double stateStart;
+
+    public Pose turnPose;
+    public Path toTurnPoint;//Back out of the corner area, still facing 0
+    public Path toOffWall;//Turn back to 270 on the short slide, the reverse of turnSideways
+    public Path toStart;//Back onto the start pose
+    public Path start_to_park;//ShootFarUnderHive path
+    public Path start_to_under;
+    public Path under_to_park;
+
+    @Override
+    public void init(){
+        //4 pickup init: hardware, its paths, and the follower on StartFarLeft facing 270
+        super.init();
+        limelight = addLimelight(hardwareMap, "LL");
+        //Shorter than the 4 pickup so there is time left to check and shoot again
+        shootEndTime = 9;//4 pickup: 10
+        cornerHoldTime = 1;//4 pickup: 2
+        //No failsafe park for this auto (MovmentMain's failsafe would cutPower() and spin the flywheel down before
+        //the second shot is done). The flywheel only stops after the second shot, then the robot parks normally
+        maxTimeBreakout = Double.MAX_VALUE;
+
+        Pose start = StartFarLeft.pose();
+        //Every ball approach pose (off wall, turn point, pre pickup, pickup) shifted up by pickupShiftY
+        //Only in these autos, the shared poses stay the same
+        Pose offWallPose = shiftUp(OffWall);
+        Pose turnPoint = shiftUp(TurnPoint);
+        Pose prePickup = shiftUp(PreLooseBallsPickup);
+        Pose loose = shiftUp(LooseBallsPickup);
+        Pose nav1 = MidUnderHive.pose();
+        Pose nav2 = Quadrant3Center.pose();
+        Pose under = UnderShotPoint.pose();
+        parkPose = ParkPoseA.pose();//Also used by the failsafe park
+        turnPose = new Pose(under.x(), under.y(), turnedHeading);
+
+        //Opening: rebuild the first path from openingStart / openingHeading (same as the 4 pickup by default)
+        Pose opening = openingStart.pose();
+        offWall = path(line(opening, offWallPose)).constant(openingHeading);
+        follower.setPose(new Pose(opening.x(), opening.y(), openingHeading));
+        follower.update();
+
+        //Rebuild the pickup paths on the shifted ball approach poses (same as BlueStartFar4PickUp otherwise)
+        turnSideways = path(line(offWallPose, turnPoint)).constant(sideHeading);
+        toPickup = path(line(turnPoint, prePickup)).constant(sideHeading);
+        cornerPose = new Pose(loose.x(), loose.y(), sideHeading);
+        intoCorner = path(line(prePickup, loose)).constant(sideHeading)
+                .with(MainConstants.foresightConfig.maxPathSpeed.at(intakeSpeed));
+        backOut = path(line(loose, prePickup)).constant(sideHeading)
+                .with(MainConstants.foresightConfig.maxPathSpeed.at(intakeSpeed));
+
+        //Return to the start pose the same way the 4 pickup left it, turning only on the slide away from the wall
+        toTurnPoint = path(line(prePickup, turnPoint)).constant(sideHeading);
+        toOffWall = path(line(turnPoint, offWallPose)).constant(startHeading);
+        toStart = path(line(offWallPose, start)).constant(startHeading);
+
+        //Same as ShootFarUnderHive: under the hive, through quadrant 3, to park, still facing 270
+        start_to_park = path(line(start, nav1), line(nav1, nav2), line(nav2, parkPose)).constant(startHeading);
+        //Under the hive to the turn point, facing 270 so it never turns on the way
+        start_to_under = path(line(start, nav1), line(nav1, under)).constant(startHeading);
+        //Already turned around, keep facing 90 to park
+        under_to_park = path(line(under, parkPose)).constant(turnedHeading);
+    }
+
+    @Override
+    public void init_loop(){
+        readHives();
+        telemetry.addData("Limelight Status", limelight.isConnected() ? "CONNECTED" : "Connecting...");
+        telemetry.update();
+    }
+
+    @Override
+    public void start(){
+        super.start();//Reset timers so time spent in init doesn't count
+        state = CheckState.SHOOTING;
+        seenStart = -1;
+    }
+
+    @Override
+    public void loop(){
+        //Read the hive every loop, MovmentMain.loop() sends the telemetry
+        readHives();
+        telemetry.addData("Check state: ", state);
+        //Intake path breakout: if the slow drive into the corner (state INTO_CORNER while following) takes longer than
+        //intakePathTimeout, stop waiting on it and go straight to the corner hold. pathTimer resets when the path starts
+        if (state == CheckState.INTO_CORNER && pathState == pathingState.RETURNMOVETOPOINT && pathTimer.seconds() > intakePathTimeout) {
+            pathState = returnState;
+            telemetry.addLine("Intake path timed out, holding corner");
+        }
+        //Turning slide breakout: state TURN_SIDEWAYS is set while following turnSideways (to 0), RETURN_OFF_WALL while following toOffWall (to 270)
+        if (pathState == pathingState.RETURNMOVETOPOINT && pathTimer.milliseconds() > 250
+                && (state == CheckState.TURN_SIDEWAYS || state == CheckState.RETURN_OFF_WALL)) {
+            double target = state == CheckState.TURN_SIDEWAYS ? sideHeading : startHeading;
+            double error = Math.abs(angleDiff(follower.pose().heading(), target));
+            if (error < turnPathTolerance || pathTimer.seconds() > maxTurnPathTime) {
+                pathState = returnState;
+            }
+        }
+        //Turret: aimed during the opening shot (FarCheckHive45 only), held at 0 (straight ahead) the rest of the auto,
+        //including after the final shot while parking. Assumes the turret is at 0 at init
+        setTurretHeading(aimTurret && state == CheckState.SHOOTING ? openingTurretTarget : 0);
+        super.loop();
+    }
+
+    //Stops feeding but leaves the flywheel spinning
+    public void stopFeed(){
+        transferServo.setPower(0);
+        pollenServo.setPower(0);
+        spinNoBackServo.setPower(0);
+        intake(0);
+    }
+
+    //Counts this loop's front hive tags for red and blue, ignores back hive tags and stale/invalid results
+    public void readHives(){
+        LLResult result = limelight.getLatestResult();
+        List<LLResultTypes.FiducialResult> fiducials = (result != null && result.isValid()) ? result.getFiducialResults() : Collections.<LLResultTypes.FiducialResult>emptyList();
+        int redTags = 0;
+        int blueFrontTags = 0;
+        for (LLResultTypes.FiducialResult fr : fiducials) {
+            int id = fr.getFiducialId();
+            if (id >= redFrontMinId && id <= redFrontMaxId) {
+                redTags++;
+            }
+            else if (id >= blueFrontMinId && id <= blueFrontMaxId) {
+                blueFrontTags++;
+            }
+        }
+        //Either alliance's front hive counts as seeing the hive
+        hiveTags = redTags + blueFrontTags;
+        telemetry.addData("Front hive tags seen: ", "Red %d, Blue %d", redTags, blueFrontTags);
+    }
+
+    //Second shot: hold the flywheel at speed for secondSpinUpTime without feeding, then launch as normal
+    public void secondShot(double now){
+        if (now - stateStart < secondSpinUpTime) {
+            stopFeed();
+            launcherMotor.setVelocity(secondShootSpeed);
+        }
+        else {
+            launch(secondShootSpeed, secondShootSpeed, 3, 1);
+        }
+    }
+
+    //A shared pose moved up (+y, toward the far wall) by pickupShiftY
+    public Pose shiftUp(UniPose p){
+        return new Pose(p.pose().x(), p.pose().y() + pickupShiftY);
+    }
+
+    //Shortest angle between two headings in radians
+    public static double angleDiff(double a, double b){
+        return Math.atan2(Math.sin(a - b), Math.cos(a - b));
+    }
+
+    //pathLogic only runs in the LOOP state, so each case after a movePath starts once that path has finished
+    @Override
+    public void pathLogic(){
+        double now = opmodeTimer.seconds();
+        switch (state) {
+            //---- Same as BlueStartFar4PickUp ----
+            case SHOOTING:
+                launch(shootSpeed, 1030, 3, 1);
+                if (now > shootEndTime) {
+                    //Stop feeding but keep the flywheel at speed through the pickup for the second shot
+                    stopFeed();
+                    launcherMotor.setVelocity(secondShootSpeed);
+                    state = CheckState.OFF_WALL;
+                    movePath(offWall, pathingState.LOOP);
+                }
+                break;
+            case OFF_WALL:
+                state = CheckState.TURN_SIDEWAYS;
+                movePath(turnSideways, pathingState.LOOP);
+                break;
+            case TURN_SIDEWAYS:
+                state = CheckState.TO_PICKUP;
+                movePath(toPickup, pathingState.LOOP);
+                break;
+            case TO_PICKUP:
+                //Intake stays on from here until the robot has backed out of the corner
+                intake(-1);
+                state = CheckState.INTO_CORNER;
+                movePath(intoCorner, pathingState.LOOP);
+                break;
+            case INTO_CORNER:
+                //In the corner, hold the pose while the intake runs
+                follower.hold(cornerPose);
+                holdTimer.reset();
+                state = CheckState.HOLD_CORNER;
+                break;
+            case HOLD_CORNER:
+                if (holdTimer.seconds() > cornerHoldTime) {
+                    state = CheckState.BACK_OUT;
+                    movePath(backOut, pathingState.LOOP);
+                }
+                break;
+            //---- New: go back to the start pose and check for the hive ----
+            case BACK_OUT:
+                intake(0);
+                //Flywheel has been spinning since the opening shot
+                launcherMotor.setVelocity(secondShootSpeed);
+                state = CheckState.RETURN_TURN_POINT;
+                movePath(toTurnPoint, pathingState.LOOP);
+                break;
+            case RETURN_TURN_POINT:
+                state = CheckState.RETURN_OFF_WALL;
+                movePath(toOffWall, pathingState.LOOP);
+                break;
+            case RETURN_OFF_WALL:
+                state = CheckState.RETURN_START;
+                movePath(toStart, pathingState.LOOP);
+                break;
+            case RETURN_START:
+                //Back on the start pose, start looking
+                stateStart = now;
+                seenStart = -1;
+                state = CheckState.CHECK;
+                break;
+            case CHECK:
+                launcherMotor.setVelocity(secondShootSpeed);
+                stateStart = now;
+                state = CheckState.SHOOT_START;
+                break;
+            case SHOOT_START:
+                secondShot(now);
+                if (now - stateStart > secondSpinUpTime + secondShootDuration) {
+                    cutPower();
+                    state = CheckState.DONE;
+                    movePath(start_to_park, pathingState.PARK);
+                }
+                break;
+            case DRIVE_UNDER:
+                //Past the hive, turn around in place to face it
+                follower.hold(turnPose);
+                stateStart = now;
+                state = CheckState.TURN_AROUND;
+                break;
+            case TURN_AROUND:
+                launcherMotor.setVelocity(secondShootSpeed);
+                double error = Math.abs(angleDiff(follower.pose().heading(), turnedHeading));
+                telemetry.addData("Turn error (deg): ", "%.1f", Math.toDegrees(error));
+                if (error < turnTolerance || now - stateStart > maxTurnTime) {
+                    stateStart = now;
+                    state = CheckState.SHOOT_UNDER;
+                }
+                break;
+            case SHOOT_UNDER:
+                //Still holding turnPose while shooting
+                secondShot(now);
+                if (now - stateStart > secondSpinUpTime + secondShootDuration) {
+                    cutPower();
+                    state = CheckState.DONE;
+                    movePath(under_to_park, pathingState.PARK);
+                }
+                break;
+            case DONE:
+                break;
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
 
 import com.pedropathing.utils.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoMain;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoMain;
 //Runs the auto launch() cycle without driving so the launch velocity can be tuned
 //A = start a launch cycle, B = emergency stop
 //Dpad up/down = pick a variable, dpad left/right = change it (changes apply live, even mid-cycle)
+@Disabled
 @TeleOp(name = "Launch_Tuner", group = "Debug")
 public class LaunchTuner extends AutoMain {
     //Same order as the launch(v0, v, t, servoPower) arguments, plus how long a cycle runs

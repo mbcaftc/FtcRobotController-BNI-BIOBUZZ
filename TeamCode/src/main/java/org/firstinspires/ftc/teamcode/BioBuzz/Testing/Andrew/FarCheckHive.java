@@ -10,13 +10,14 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing.BlueStartFar4PickUp;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 
 import java.util.Collections;
 import java.util.List;
-
+// hi Andrew i better at coding from Walter
 //Runs the 4 pickup auto (shoot from StartFarLeft, intake the corner pollen), then drives back to the start pose and checks for a front hive (red or blue)
 //  - Tags seen: shoot from the start pose, then follow the ShootFarUnderHive path to park
 //  - No tags: drive under the hive, turn around in place to face it (90), shoot, then park
@@ -35,7 +36,7 @@ public class FarCheckHive extends BlueStartFar4PickUp {
     public double checkTime = 1;//Seconds at the start pose to look for a front hive before driving under
     public double confirmSeconds = 0.5;//Tags have to be seen this long in a row (filters out flicker)
     public double secondShootSpeed = 960;//Launcher velocity for the second shot (same as Start_At_Hive / FarHiveTip)
-    public double secondShootDuration = 7;//Seconds to shoot the corner pollen for
+    public double secondShootDuration = 5.5;//Seconds to shoot the corner pollen for
     public double secondSpinUpTime = 1;//Seconds holding the flywheel at speed before feeding on the second shot (adds to secondShootDuration)
     public double pickupShiftY = 1.5;//Ball approach poses (PreLooseBallsPickup, LooseBallsPickup) moved this far up (+y, toward the far wall)
     public double turnTolerance = Math.toRadians(5);//Close enough to the turned heading to start shooting
@@ -279,21 +280,8 @@ public class FarCheckHive extends BlueStartFar4PickUp {
                 break;
             case CHECK:
                 launcherMotor.setVelocity(secondShootSpeed);
-                if (hiveTags > 0) {
-                    if (seenStart < 0) seenStart = now;
-                }
-                else {
-                    seenStart = -1;
-                }
-                if (seenStart >= 0 && now - seenStart >= confirmSeconds) {
-                    stateStart = now;
-                    state = CheckState.SHOOT_START;
-                }
-                else if (now - stateStart > checkTime) {
-                    //Can't see the hive, drive under it (launcher keeps spinning)
-                    state = CheckState.DRIVE_UNDER;
-                    movePath(start_to_under, pathingState.LOOP);
-                }
+                stateStart = now;
+                state = CheckState.SHOOT_START;
                 break;
             case SHOOT_START:
                 secondShot(now);
