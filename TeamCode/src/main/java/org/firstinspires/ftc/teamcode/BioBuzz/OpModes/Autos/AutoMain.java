@@ -48,8 +48,9 @@ public class AutoMain extends OpMode {
     public double turretHeadingSign = 1;//1 means positive power increases heading
     public double maxTurretAngle = 75;//Degrees either side of center the turret can go
     public double pastAxonPosition = 0;
-    public double totalAxonTravel = 0;
-    public double turretCurrentHeading = 0;
+    public double totalAxonTravel;
+    public double turretCurrentHeading = 0.0;
+
 
     public void initHardWare(){
         intakeMotor = addMotor(hardwareMap, "intake", true, true);
@@ -63,11 +64,8 @@ public class AutoMain extends OpMode {
         spinNoBackServo = addCRServo(hardwareMap, "spinNoBack", true);
         flowerAxon = addServo(hardwareMap, "flowerAxon", true);
 
-        //Turret position feedback, assumes the turret starts at 0 degrees (straight ahead)
-        axonFeedback = addAnalogueInput(hardwareMap, "axon");
-        pastAxonPosition = (axonFeedback.getVoltage() / 3.3) * 360;
-        totalAxonTravel = 0;
-        turretCurrentHeading = 0;
+        axonFeedback = addAnalogueInput(hardwareMap, "axon"); //voltage from 0 - max(3.3v)
+        pastAxonPosition = getAxonPosition(axonFeedback); //apon startup 0 is set up start and devation is messured from that
     }
     public void setup(){
         pathTimer = new Timer();
@@ -87,6 +85,9 @@ public void init(){}//do not add anything needed for opmode to compile
     }
 
     public void loop() {}
+    public double getAxonPosition(AnalogInput input){
+        return (input.getVoltage() / 3.3) * 360; //( max / current ) * 360 is the porpotonal amount and as such can be used to find the angle
+    }
 
     //Headings are in degrees, Pedro uses radians
     public Path buildConstantPaths(Pose... poseList) {
@@ -148,10 +149,8 @@ public void init(){}//do not add anything needed for opmode to compile
         intakeMotorTwo.setPower(power);
     }
 
-    //Same as TeleOP, tracks the turret heading from the axon encoder (call once per loop)
     public void calcTurretPos(){
-        double pos = (axonFeedback.getVoltage() / 3.3) * 360;
-        double delta = pos - pastAxonPosition;
+        double delta = getAxonPosition(axonFeedback) - pastAxonPosition;
         //Encoder passed the 360/0 line
         if (delta > 180) {
             delta -= 360;
@@ -160,10 +159,10 @@ public void init(){}//do not add anything needed for opmode to compile
         }
         totalAxonTravel += delta;
         turretCurrentHeading = totalAxonTravel / 2.5;
-        pastAxonPosition = pos;
+        pastAxonPosition = getAxonPosition(axonFeedback);
     }
 
-    //Turns the turret toward targetDegrees (0 is straight ahead) using the TeleOP autotarget logic
+    //Turns the turret toward targetDegrees
     //Call every loop, returns true while still turning and false once inside the target window
     public boolean setTurretHeading(double targetDegrees){
         calcTurretPos();
