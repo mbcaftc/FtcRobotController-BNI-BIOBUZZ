@@ -14,7 +14,7 @@ public class MovmentMain extends AutoMain{
 
     protected static UniPose StartCloseLeft = new UniPose(83, 8.8);//1
     protected static  UniPose StartCloseRight = new UniPose(106, 8.8);//2
-    protected static  UniPose MidUnderHive = new UniPose(84, 72);//3
+    protected static  UniPose MidUnderHive = new UniPose(83, 72);//3
 
     protected static  UniPose MidAroundCloseHive = new UniPose(84, 72);//this is close to flower//4
     protected static  UniPose MidAroundCloseHumans = new UniPose (124, 72 );//this is close to humans//5
@@ -41,7 +41,7 @@ public class MovmentMain extends AutoMain{
     protected static final UniPose FlowerFarSouth = new UniPose(122, 94);//22
     //Short sideways move where the robot turns from 270 to 0 on the way to the loose balls
     protected static final UniPose TurnPoint = new UniPose(95, 115.5);
-
+    protected static final UniPose RightBackCorner = new UniPose(135.5, 7.5);
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
     public double maxTimeBreakout = 25;
@@ -117,6 +117,11 @@ public class MovmentMain extends AutoMain{
             telemetry.addLine("FAILSAFE: PARKING.");
         }
 
+        //Set turret to designated angle, stop when in gate
+        if(!setTurretHeading(turretAngle)){
+            turretServo.setPower(0);
+        }
+
         switch (pathState) {
             case START:
                 pathState = pathingState.LOOP;
@@ -142,8 +147,6 @@ public class MovmentMain extends AutoMain{
 
             case LOOP:
                 pathLogic();
-                //Set turret to designated angle
-                setTurretHeading(turretAngle);
                 break;
 
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew;
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos;
 
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.api.Paths.path;
@@ -8,27 +8,25 @@ import com.pedropathing.paths.Path;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "IntakeAuto", group = "Debug")
 public class IntakeAuto extends MovmentMain {
     //Starting Position
-    public Pose startPose = StartFarLeft.setDeg(270);
+    public Pose startPose;
     //Navigate to the intake position
-    public Pose nav1 = TurnPoint.setDeg(0);
+    public Pose nav1;
     //Start intake position
-    public Pose startIntake = PreLooseBallsPickup.setDeg(0);
+    public Pose startIntake;
     //End of intake position
-    public Pose endIntake = LooseBallsPickup.setDeg(0);
+    public Pose endIntake;
     //Control point for returning to shooting pose
-    public Pose nav2 = TurnPoint.setDeg(180);
+    public Pose nav2;
     //Second shooting pose
-    public Pose secondShot = StartFarLeft.setDeg(270);
+    public Pose secondShot;
     //Control points for parking navigation
-    public Pose nav3 = MidUnderHive.setDeg(270);
-    public Pose nav4 = Quadrant3Center.setDeg(270);
+    public Pose nav3;
+    public Pose nav4;
     //Parking Pose
-    public Pose parkingPose = ParkPoseB.setDeg(180);
+    public Pose parkingPose;
 
 
     public Path start_to_intake;
@@ -43,15 +41,19 @@ public class IntakeAuto extends MovmentMain {
     public double intakeHoldDuration = 400;
 
     //How long each shot may run
-    public double firstShotTime = 7.5;
-    public double secondShotTime = 7.5;
+    public double firstShotTime;
+    public double secondShotTime;
 
     //Time that robot started second shooting (seconds)
     public double secondShotStart;
 
     //Desired turret angle at each shot
-    public double firstShotAngle = 0;
-    public double secondShotAngle = 0;
+    public double firstShotAngle;
+    public double secondShotAngle;
+
+    //Each shot Velocity
+    public double firstShotVelocity;
+    public double secondShotVelocity;
 
     public double intakeSpeed = .6;
 
@@ -89,11 +91,11 @@ public class IntakeAuto extends MovmentMain {
             //Launch Before moving
             case START:
                 turretAngle = firstShotAngle;
-                launch();
+                launch(firstShotVelocity);
                 if (opmodeTimer.seconds() > firstShotTime) {
                     turretAngle = 0;
                     cutPower();
-                    launcherMotor.setVelocity(970);
+                    launcherMotor.setVelocity(secondShotVelocity);
                     movePath(start_to_intake);
                     current = autoState.INTAKE;
                 }
@@ -127,7 +129,7 @@ public class IntakeAuto extends MovmentMain {
                 break;
             
             case SHOOTTWO:
-                launch();
+                launch(secondShotVelocity);
                 if (opmodeTimer.seconds() - secondShotStart > secondShotTime) {
                     turretAngle = 0;
                     cutPower();
@@ -137,21 +139,4 @@ public class IntakeAuto extends MovmentMain {
                 break;
         }
     }
-
-
-
-    @Override
-    public void init(){
-        //AutoMain init
-        setup();
-        initHardWare();
-        //Set the breakout time to 29s because auto is long
-        maxTimeBreakout = 29;
-        //Set up the paths
-        buildPaths();
-        //Start the follower
-        follower.setPose(startPose);
-        follower.update();
-    }  
-
 }

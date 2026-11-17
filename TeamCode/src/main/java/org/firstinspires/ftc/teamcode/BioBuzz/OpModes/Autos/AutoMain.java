@@ -136,6 +136,25 @@ public void init(){}//do not add anything needed for opmode to compile
             intakeMotorTwo.setPower(0);
         }
     }
+    public void launch(double laucnhSpeed){
+        launcherMotor.setVelocity(laucnhSpeed);
+        //Launch over minimum velocity
+        if(launcherMotor.getVelocity() > laucnhSpeed - 50) {
+            transferServo.setPower(1);
+            pollenServo.setPower(-1);
+            spinNoBackServo.setPower(-1);
+            intakeMotor.setPower(-1);
+            intakeMotorTwo.setPower(-1);
+        }
+        else{
+            shotTimer.reset();
+            transferServo.setPower(0);
+            pollenServo.setPower(0);
+            spinNoBackServo.setPower(0);
+            intakeMotor.setPower(0);
+            intakeMotorTwo.setPower(0);
+        }
+    }
     public void launch(){
         double laucnhSpeed = 970;
         launcherMotor.setVelocity(laucnhSpeed);
