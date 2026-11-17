@@ -51,6 +51,9 @@ public class MovmentMain extends AutoMain{
     //Time in seconds to break out of a path
     public double breakoutTime = 30;
 
+    //Desired turret angle
+    public double turretAngle = 0;
+
     //set up simple states
     public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END, LOOP}
     public pathingState pathState = pathingState.START;
@@ -139,6 +142,8 @@ public class MovmentMain extends AutoMain{
 
             case LOOP:
                 pathLogic();
+                //Set turret to designated angle
+                setTurretHeading(turretAngle);
                 break;
 
 

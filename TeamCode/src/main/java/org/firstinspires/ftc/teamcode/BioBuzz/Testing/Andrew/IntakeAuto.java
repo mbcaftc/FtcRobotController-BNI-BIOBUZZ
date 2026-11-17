@@ -49,11 +49,14 @@ public class IntakeAuto extends MovmentMain {
     //Time that robot started second shooting (seconds)
     public double secondShotStart;
 
+    //Desired turret angle at each shot
+    public double firstShotAngle = 0;
+    public double secondShotAngle = 0;
 
     public double intakeSpeed = .6;
 
     //StateMachine init
-    public enum autoState {START, INTAKE, HOLDINTAKE, NAVTOSHOOT, STARTSHOOT, SHOOTTWO, PARK, END}
+    public enum autoState {START, INTAKE, HOLDINTAKE, NAVTOSHOOT, STARTSHOOT, SHOOTTWO, CENTERTURRET, PARK, END}
     public autoState current = autoState.START;
 
 
@@ -85,8 +88,10 @@ public class IntakeAuto extends MovmentMain {
         switch(current){
             //Launch Before moving
             case START:
+                turretAngle = firstShotAngle;
                 launch();
                 if (opmodeTimer.seconds() > firstShotTime) {
+                    turretAngle = 0;
                     cutPower();
                     launcherMotor.setVelocity(970);
                     movePath(start_to_intake);
@@ -108,6 +113,7 @@ public class IntakeAuto extends MovmentMain {
                 break;
             
             case NAVTOSHOOT:
+                turretAngle = secondShotAngle;
                 if(opmodeTimer.milliseconds() - intakePositionHoldingTime > intakeHoldDuration){
                     current = autoState.STARTSHOOT;
                     movePath(shootTwo);
@@ -123,12 +129,12 @@ public class IntakeAuto extends MovmentMain {
             case SHOOTTWO:
                 launch();
                 if (opmodeTimer.seconds() - secondShotStart > secondShotTime) {
+                    turretAngle = 0;
                     cutPower();
                     movePath(shoot_to_park);
                     current = autoState.PARK;
                 }
                 break;
-
         }
     }
 
