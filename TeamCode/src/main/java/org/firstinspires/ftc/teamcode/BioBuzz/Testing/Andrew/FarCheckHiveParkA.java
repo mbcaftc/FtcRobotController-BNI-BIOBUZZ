@@ -38,7 +38,6 @@ public class FarCheckHiveParkA extends BlueStartFar4PickUp {
     public double secondShootSpeed = 960;//Launcher velocity for the second shot (same as Start_At_Hive / FarHiveTip)
     public double secondShootDuration = 5.5;//Seconds to shoot the corner pollen for
     public double secondSpinUpTime = 1;//Seconds holding the flywheel at speed before feeding on the second shot (adds to secondShootDuration)
-    public double pickupShiftY = 1.5;//Ball approach poses (PreLooseBallsPickup, LooseBallsPickup) moved this far up (+y, toward the far wall)
     public double turnTolerance = Math.toRadians(5);//Close enough to the turned heading to start shooting
     public double maxTurnTime = 2.5;//Shoot anyway if the turn hasn't settled by then
     public double intakePathTimeout = 1;//Seconds before the slow drive into the corner gives up and starts the corner hold
@@ -85,12 +84,11 @@ public class FarCheckHiveParkA extends BlueStartFar4PickUp {
         maxTimeBreakout = Double.MAX_VALUE;
 
         Pose start = StartFarLeft.pose();
-        //Every ball approach pose (off wall, turn point, pre pickup, pickup) shifted up by pickupShiftY
-        //Only in these autos, the shared poses stay the same
-        Pose offWallPose = shiftUp(OffWall);
-        Pose turnPoint = shiftUp(TurnPoint);
-        Pose prePickup = shiftUp(PreLooseBallsPickup);
-        Pose loose = shiftUp(LooseBallsPickup);
+        //Ball approach poses (off wall, turn point, pre pickup, pickup)
+        Pose offWallPose = OffWall.pose();
+        Pose turnPoint = TurnPoint.pose();
+        Pose prePickup = PreLooseBallsPickup.pose();
+        Pose loose = LooseBallsPickup.pose();
         Pose nav1 = MidUnderHive.pose();
         Pose nav2 = Quadrant3Center.pose();
         Pose under = UnderShotPoint.pose();
@@ -202,11 +200,6 @@ public class FarCheckHiveParkA extends BlueStartFar4PickUp {
         else {
             launch(secondShootSpeed, secondShootSpeed, 3, 1);
         }
-    }
-
-    //A shared pose moved up (+y, toward the far wall) by pickupShiftY
-    public Pose shiftUp(UniPose p){
-        return new Pose(p.pose().x(), p.pose().y() + pickupShiftY);
     }
 
     //Shortest angle between two headings in radians

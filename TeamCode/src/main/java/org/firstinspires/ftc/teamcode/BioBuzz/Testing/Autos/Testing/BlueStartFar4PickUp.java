@@ -19,9 +19,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
 @Autonomous(name = "Start_Far_PickUp_oz", group = "Drive")
 public class BlueStartFar4PickUp extends MovmentMain {
 
-    protected static final UniPose OffWall = new UniPose(86, 114);
-    //Short sideways move where the robot turns from 270 to 0
-    protected static final UniPose TurnPoint = new UniPose(95, 114);
+    protected static final UniPose OffWall = new UniPose(86, 115.5);//Same y as TurnPoint in MovmentMain
 
     public double startHeading = Math.toRadians(270);
     public double sideHeading = Math.toRadians(0);//Intake side faces the loose balls

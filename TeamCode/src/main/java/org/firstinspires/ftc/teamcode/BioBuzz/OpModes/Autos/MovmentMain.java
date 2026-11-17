@@ -24,8 +24,8 @@ public class MovmentMain extends AutoMain{
 
     protected static final UniPose ParkPoseA = new UniPose(128, 47);//11
     protected static final UniPose ParkPoseB = new UniPose(128, 25);//12
-    protected static final UniPose LooseBallsPickup =  new UniPose(133, 130);//13
-    protected static final UniPose PreLooseBallsPickup =  new UniPose(110, 130);//
+    protected static final UniPose LooseBallsPickup =  new UniPose(133, 131.5);//13
+    protected static final UniPose PreLooseBallsPickup =  new UniPose(110, 131.5);//
     protected static final UniPose Quadrant1Center = new UniPose(108, 108);//15
     protected static final UniPose Quadrant2Center = new UniPose(72, 108);//14
     protected static final UniPose Quadrant3Center = new UniPose(83, 36);//16
@@ -39,6 +39,8 @@ public class MovmentMain extends AutoMain{
     protected static final UniPose FlowerCloseEast = new UniPose(115, 8.8 );//19
     protected static final UniPose FlowerFarNorth = new UniPose(132, 94);//22
     protected static final UniPose FlowerFarSouth = new UniPose(122, 94);//22
+    //Short sideways move where the robot turns from 270 to 0 on the way to the loose balls
+    protected static final UniPose TurnPoint = new UniPose(95, 115.5);
 
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
@@ -46,6 +48,8 @@ public class MovmentMain extends AutoMain{
     //Where the auto parks, set it in init() so the failsafe can drive here
     public Pose parkPose;
     public boolean failsafeTriggered = false;
+    //Time in seconds to break out of a path
+    public double breakoutTime = 30;
 
     //set up simple states
     public enum pathingState {START, MOVETOPOINT, RETURNMOVETOPOINT, PARK, END, LOOP}
@@ -58,7 +62,21 @@ public class MovmentMain extends AutoMain{
         moveToPointChain = path;
         returnState = state;
         pathState = pathingState.MOVETOPOINT;
+        breakoutTime = 30;
     }
+    public void movePath(Path path){
+        moveToPointChain = path;
+        returnState = pathingState.LOOP;
+        pathState = pathingState.MOVETOPOINT;
+        breakoutTime = 30;
+    }
+     public void movePath(Path path, double breakoutTime){
+        moveToPointChain = path;
+        returnState = pathingState.LOOP;
+        pathState = pathingState.MOVETOPOINT;
+        this.breakoutTime = breakoutTime;
+    }
+
     public void pathLogic(){}//this is being overwritten
     @Override
     public void loop() {
@@ -111,6 +129,9 @@ public class MovmentMain extends AutoMain{
             case RETURNMOVETOPOINT:
                 // Wait at least 250ms for the follower to pick up the path and become busy
                 if (pathTimer.milliseconds() > 250 && !follower.isBusy()) {
+                    pathState = returnState;
+                }
+                if(pathTimer.seconds() > breakoutTime){
                     pathState = returnState;
                 }
                 break;
