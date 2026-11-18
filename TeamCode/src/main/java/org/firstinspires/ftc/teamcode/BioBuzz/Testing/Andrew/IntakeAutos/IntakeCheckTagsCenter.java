@@ -22,7 +22,9 @@ public class IntakeCheckTagsCenter extends IntakeCheckHiveAuto {
         nav3Far = MidUnderHive.setDeg(270);
         nav4Far = Quadrant3Center.setDeg(270);
 
-        nav3Close = Quadrant3Center.setDeg(270);
+        nav3Close = Quadrant3Center.setDeg(90);
+        secondShotClose = Quadrant3Back.setDeg(90);
+
 
         //Parking Pose
         parkingPose = ParkPoseB.setDeg(180);

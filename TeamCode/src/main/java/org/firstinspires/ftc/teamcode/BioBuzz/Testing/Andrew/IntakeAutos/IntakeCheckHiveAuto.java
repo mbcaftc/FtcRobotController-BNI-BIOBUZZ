@@ -37,7 +37,6 @@ public class IntakeCheckHiveAuto extends MovmentMain {
     public Pose nav4Far;
 
     public Pose nav3Close;
-    public Pose nav4Close;
     //Parking Pose
     public Pose parkingPose;
 
@@ -107,6 +106,8 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                         line(nav2, secondShotFar).constant(secondShotFar));
 
 
+        navUnderHive = path(line(secondShotFar, secondShotClose).constant(secondShotClose));
+
         //Navigate from final shot to the parking position.
         shootClose_to_park = path(line(secondShotClose, nav3Close).tangent(),
                 line(nav3Close, parkingPose).constant(parkingPose));
@@ -152,7 +153,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
             case NAVTOSHOOT:
                 turretAngle = secondShotAngle;
                 if(opmodeTimer.milliseconds() - intakePositionHoldingTime > intakeHoldDuration){
-                    current = autoState.STARTSHOOT;
+                    current = autoState.CHECKHIVES;
                     movePath(shootTwo);
                 }
                 break;
