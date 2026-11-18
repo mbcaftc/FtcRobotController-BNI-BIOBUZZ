@@ -6,6 +6,7 @@ import static com.pedropathing.api.Paths.path;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addAnalogueInput;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addCRServo;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addLimelight;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotor;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotorEx;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addServo;
@@ -14,6 +15,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.utils.Timer;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -39,6 +42,7 @@ public class AutoMain extends OpMode {
     public CRServo turretServo;
     public CRServo pollenServo;
     public AnalogInput axonFeedback;
+    protected Limelight3A limelight;
 
     //Turret targeting values (same as TeleOP)
     public double autoVariation = 2;//Degrees of error that count as on target
@@ -63,6 +67,9 @@ public class AutoMain extends OpMode {
         pollenServo = addCRServo(hardwareMap, "pollen", true);
         spinNoBackServo = addCRServo(hardwareMap, "spinNoBack", true);
         flowerAxon = addServo(hardwareMap, "flowerAxon", true);
+
+        //Init limelight
+        limelight = addLimelight(hardwareMap, "LL");
 
         axonFeedback = addAnalogueInput(hardwareMap, "axon"); //voltage from 0 - max(3.3v)
         pastAxonPosition = getAxonPosition(axonFeedback); //apon startup 0 is set up start and devation is messured from that

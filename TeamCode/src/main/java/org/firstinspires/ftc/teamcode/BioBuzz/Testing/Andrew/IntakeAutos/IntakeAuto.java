@@ -5,9 +5,16 @@ import static com.pedropathing.api.Paths.path;
 
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.MovmentMain;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
+
+import java.util.Collections;
+import java.util.List;
 
 public class IntakeAuto extends MovmentMain {
     //Starting Position
@@ -54,7 +61,6 @@ public class IntakeAuto extends MovmentMain {
     //Each shot Velocity
     public double firstShotVelocity;
     public double secondShotVelocity;
-
     public double intakeSpeed = .6;
 
     //StateMachine init
