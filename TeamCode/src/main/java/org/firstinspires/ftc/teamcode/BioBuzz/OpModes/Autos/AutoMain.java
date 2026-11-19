@@ -162,18 +162,55 @@ public void init(){}//do not add anything needed for opmode to compile
             intakeMotorTwo.setPower(0);
         }
     }
-    public void burnerLaunch(double laucnhSpeed, double a){
-        launcherMotor.setVelocity(laucnhSpeed);
+    private double lastError = 0;
+    private double integralSum = 0;
 
-        //Launch over minimum velocity
-        if(launcherMotor.getVelocity() > laucnhSpeed - 50) {
+    private final double BASE_kP = 0.0015;
+    private final double BASE_kI = 0.0001;
+    private final double BASE_kD = 0.00005;
+    private final double kF = 0.00035;
+    double last = 0;
+
+
+    public void burnerLaunch(double launchSpeed, double aggressiveness) {
+        if (launcherMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        double dt = last = opmodeTimer.seconds();
+        last = opmodeTimer.seconds();
+
+        double currentVelocity = launcherMotor.getVelocity();
+        double error = launchSpeed - currentVelocity;
+
+        double kP = BASE_kP * aggressiveness;
+        double kI = BASE_kI * aggressiveness;
+        double kD = BASE_kD * aggressiveness;
+
+        double pTerm = error * kP;
+
+        if (Math.abs(error) < 300) {
+            integralSum += error * dt;
+        } else {
+            integralSum = 0;
+        }
+        double iTerm = integralSum * kI;
+
+        double derivative = (error - lastError) / dt;
+        double dTerm = derivative * kD;
+        lastError = error;
+
+        double fTerm = launchSpeed * kF;
+
+        double power = Range.clip(pTerm + iTerm + dTerm + fTerm, -1.0, 1.0);
+        launcherMotor.setPower(power);
+
+        if (currentVelocity > launchSpeed - 50) {
             transferServo.setPower(1);
             pollenServo.setPower(-1);
             spinNoBackServo.setPower(-1);
             intakeMotor.setPower(-1);
             intakeMotorTwo.setPower(-1);
-        }
-        else{
+        } else {
             shotTimer.reset();
             transferServo.setPower(0);
             pollenServo.setPower(0);
@@ -182,6 +219,7 @@ public void init(){}//do not add anything needed for opmode to compile
             intakeMotorTwo.setPower(0);
         }
     }
+
     public void cutPower(){
         transferServo.setPower(0);
         pollenServo.setPower(0);
