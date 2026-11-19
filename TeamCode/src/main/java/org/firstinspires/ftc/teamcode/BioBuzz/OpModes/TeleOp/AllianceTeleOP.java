@@ -8,7 +8,7 @@ import java.util.List;
 
 //Shared base for RedTeleOP and BlueTeleOP. Same as TeleOP, but only autotargets the hives of one alliance.
 //No @TeleOp annotation, so it does not show up on the Driver Station by itself.
-public abstract class AllianceTeleOP extends TunedTeleOP {
+public abstract class AllianceTeleOP extends TeleOP {
     //April Tag ID ranges for this alliance's hives (set by RedTeleOP / BlueTeleOP)
     protected int frontMinId;
     protected int frontMaxId;

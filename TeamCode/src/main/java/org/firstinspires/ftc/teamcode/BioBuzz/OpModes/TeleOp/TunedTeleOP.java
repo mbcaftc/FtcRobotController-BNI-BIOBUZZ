@@ -152,7 +152,7 @@ public class TunedTeleOP extends OpMode{
     boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 1080;
+    public double pollenTargetVelocity = 955;
     public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
     public double axonIncrementAmount = 0;
@@ -388,11 +388,17 @@ public class TunedTeleOP extends OpMode{
     }
     public void inputHandling(){
         //Toggle launcher
-        if(gamepad2.rightTriggerWasPressed()){launcherTrigger = !launcherTrigger;}
+        if(gamepad2.rightTriggerWasPressed()){
+            launcherTrigger = !launcherTrigger;
+        }
         //Toggle intake
         if(gamepad1.leftTriggerWasPressed()){intakeTrigger = !intakeTrigger;}
         //Toggle transfer servo
-        if(gamepad2.aWasPressed()){transferTrigger = !transferTrigger;}
+        if(gamepad2.aWasPressed()){
+            transferTrigger = !transferTrigger;
+            integralSum = 0;
+            lastError = 0;
+        }
         //Step once per press, not every loop while held
         if(gamepad2.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
         if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
@@ -410,8 +416,9 @@ public class TunedTeleOP extends OpMode{
             stripOnTarget = false;
         }
 
-        if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
 
+        if(gamepad2.bWasPressed()){pollenTargetVelocity = 955;}
+        if(gamepad2.xWasPressed()){pollenTargetVelocity = 1000;}
         //Zero the turret, wherever it is now becomes 0 degrees
         if(gamepad2.rightStickButtonWasPressed()){
             totalAxonTravel = 0;
@@ -452,8 +459,9 @@ public class TunedTeleOP extends OpMode{
 
         double pTerm = error * kP;
 
-        if (Math.abs(error) < 300) {
+        if (error <= 40 && error > -300) {
             integralSum += error * dt;
+            integralSum = Range.clip(integralSum, -.15 / kI, .15 / kI);
         }
         double iTerm = integralSum * kI;
 
