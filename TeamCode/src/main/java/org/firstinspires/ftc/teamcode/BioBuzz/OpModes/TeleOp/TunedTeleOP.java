@@ -1,0 +1,600 @@
+package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.TeleOp;
+
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addAnalogueInput;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addCRServo;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addIMU;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addLimelight;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotor;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotorEx;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addOdometry;
+import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addServo;
+
+import com.pedropathing.utils.Timer;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.Color;
+import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.GoBildaPrismDriver;
+import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations;
+
+import java.util.Collections;
+import java.util.List;
+public class TunedTeleOP extends OpMode{
+    public TunedTeleOP(){}
+    //CURRENT CONFIG
+    /*
+    * ---Control Hub Params---
+    * Motors:
+    * 0-FL
+    * 1-BL
+    * 2-BR
+    * 3-FR
+    *
+    * ---Expansion Hub Params---
+    * Motors:
+    * 0-intake
+    * 1-launcher
+    *
+    * Servos:
+    * (CRServos)
+    * 0-transfer
+    * 1-turret
+    * (Servo)
+    * 2-LED
+    * (CRServo)
+    * 3-pollen
+    *
+    * Analog Input Devices
+    * (Analog Input)
+    * 0-axon
+    *
+    * I2C Bus:
+    * (REV internal IMU (BNO055))
+    * Bus 0-imu
+    * (GoBilda Pinpoint Odometry Computer)
+    * Bus 1-ODO
+    * (GoBildaPrism RGB Driver)
+    * 3-PRISM
+    *
+    * ---Other Devices---
+    * Limelight - LL
+    *
+    * */
+
+    //<editor-fold desc="Tuning">
+    private double lastError = 0;
+    private double integralSum = 0;
+
+    private final double BASE_kP = 0.0015;
+    private final double BASE_kI = 0.0001;
+    private final double BASE_kD = 0.00005;
+    private final double kF = 0.00035;
+    double last = 0;
+    Timer OpModeTimer;
+    //</editor-fold>
+    //<editor-fold desc="Environment Vars">
+    public boolean blueTeam = true;
+    public double flowerHeight = .57;
+    //</editor-fold>
+    //<editor-fold desc="AutoTargeting Variables">
+    //Limelight Cam data
+    protected LLResult result;
+    //Auto Correct X Variation
+    double autoVariation = 2;
+    //Autocorrect rotation speed
+    double autoSpeed = .5;
+    double pastAxonPosition = 0;
+    double totalAxonTravel = 0;
+    double turretCurrentHeading = 0;
+
+    double kP = 0.0055;          // power per degree of error
+    double kStatic = 0.05;      // minimum power that actually moves the turret
+    double maxTurretPower = 0.35;
+    double turretDirection = -1; // flip to -1 if it turns away from the tag
+    double turretHeadingSign = 1; // flip to -1 if recentering turns away from center (1 = positive power increases heading)
+    double maxTurretAngle = 75;  // degrees either side of center the turret is allowed to go
+
+    //Tags to detect
+    public boolean blueSide;
+
+
+    //</editor-fold>
+    //<editor-fold desc="Component Initializations">
+    public IMU imu = null;
+    protected Limelight3A limelight;
+    public GoBildaPrismDriver LEDStrip;
+    public Servo led;
+    public DcMotor intakeMotor;
+    public DcMotor intakeMotorTwo;
+    public DcMotorEx launcherMotor;
+    public CRServo transferServo;
+    public CRServo spinNoBackServo;
+    public Servo flowerAxon;
+    public DcMotor FrontRight;
+    public DcMotor FrontLeft;
+    public DcMotor BackRight;
+    public DcMotor BackLeft;
+    public GoBildaPinpointDriver odo;
+    public CRServo turretServo;
+    public CRServo pollenServo;
+    public AnalogInput axonFeedback;
+    //</editor-fold>
+    //<editor-fold desc="Drivetrain Variables">
+    public boolean config1 = true;
+    protected double leftStickYVal;
+    protected double leftStickXVal;
+    protected double rightStickYVal;
+    protected double rightStickXVal;
+    protected double frontLeftSpeed;
+    protected double frontRightSpeed;
+    protected double rearLeftSpeed;
+    protected double rearRightSpeed;
+    protected double powerThreshold;
+    public double moveSpeedMultiply = 1;
+    //</editor-fold>
+    //<editor-fold desc="Button Triggers">
+    boolean launcherTrigger = false;
+    boolean intakeTrigger = false;
+    boolean transferTrigger = false;
+    boolean flowerAxonTrigger = false;
+    //</editor-fold>
+    //<editor-fold desc="Launching Variables">
+    public double pollenTargetVelocity = 1080;
+    public double nectarTargetVelocity = 1200;
+    public double velocityStep = 25;//Ticks/sec changed per dpad press
+    public double axonIncrementAmount = 0;
+
+    public boolean useVelocity = true;
+    
+    //</editor-fold>
+    //Strip is solid green while inside the autotarget window, alliance color otherwise
+    protected boolean stripOnTarget = false;
+    public void setStripOnTarget(boolean onTarget) {
+        //Only write to the strip when it changes, I2C writes every loop slow the loop down
+        if (onTarget == stripOnTarget) return;
+        stripOnTarget = onTarget;
+        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(onTarget ? Color.GREEN : (blueTeam ? Color.BLUE : Color.RED)));
+    }
+    public void autoTarget() {
+        if (gamepad2.y) {
+            result = limelight.getLatestResult();
+
+            double FavgX = 0;
+            double FavgY = 0;
+            double Fang = 0;
+            double FYoffset = 0;
+            int FTags = 0;
+
+            double BavgX = 0;
+            double BavgY = 0;
+            double Bang = 0;
+            double BYoffset = 0;
+            int BTags = 0;
+
+            //Average all tags positions that are within range, ignore stale/invalid results
+            List<LLResultTypes.FiducialResult> fiducialResults = (result != null && result.isValid()) ? result.getFiducialResults() : Collections.<LLResultTypes.FiducialResult>emptyList();
+
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+
+                Pose3D targetPose = fr.getTargetPoseCameraSpace();
+                if(blueSide){
+                    //BlueFront Cluster
+                    if (fr.getFiducialId() >= 38 && fr.getFiducialId() <= 41) {
+                        FTags++;
+                        FavgX += fr.getTargetXDegrees();
+                        FavgY += fr.getTargetYDegrees();
+                        Fang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                        FYoffset += targetPose.getPosition().y;
+                    }
+                    //BlueBack Cluster
+                    if (fr.getFiducialId() >= 42 && fr.getFiducialId() <= 45) {
+                        BTags++;
+                        BavgX += fr.getTargetXDegrees();
+                        BavgY += fr.getTargetYDegrees();
+                        Bang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                        BYoffset += targetPose.getPosition().y;
+                    }
+                }
+                else {
+                    //RedBack Cluster
+                    if (fr.getFiducialId() >= 30 && fr.getFiducialId() <= 33) {
+                        BTags++;
+                        BavgX += fr.getTargetXDegrees();
+                        BavgY += fr.getTargetYDegrees();
+                        Bang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                        BYoffset += targetPose.getPosition().y;
+                    }
+                    //RedFront Cluster
+                    if (fr.getFiducialId() >= 34 && fr.getFiducialId() <= 37) {
+                        FTags++;
+                        FavgX += fr.getTargetXDegrees();
+                        FavgY += fr.getTargetYDegrees();
+                        Fang += targetPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                        FYoffset += targetPose.getPosition().y;
+                    }
+                }
+            }
+
+            //Average all X and Y values based on how many tags were detected
+            FavgX /= FTags;
+            FYoffset /= FTags;
+
+            BavgX /= BTags;
+            BYoffset /= BTags;
+
+            //Check if any tags are being seen
+            if(FTags > 0 || BTags > 0) {
+                //Take the lower of the 2 y values as the higher hive
+                boolean front = FYoffset < BYoffset;
+                //If no tags are seen from the other hive, then just target the one seen
+                if(FTags == 0){
+                    front = false;
+                }
+                if(BTags == 0){
+                    front = true;
+                }
+
+                //Set the target hive as the higher (lesser y offset) of the 2 or the one seen
+                double avgAng = front ? FavgX : BavgX;
+
+                telemetry.addData("Avg Ang: ", avgAng);
+
+                //Move according to midpoint of hive
+                if (Math.abs(avgAng) > autoVariation) {
+                    // Power scales with error
+                    double power = kP * avgAng;
+
+                    // Add enough power to overcome friction so it doesn't stall near the target
+                    power += Math.signum(avgAng) * kStatic;
+
+                    // Cap the speed so it can't build up too much momentum
+                    power = Range.clip(power, -maxTurretPower, maxTurretPower);
+
+                    axonIncrementAmount = turretDirection * power;
+                    LEDCon(led, Math.abs(avgAng) > 6.0 ? 6 : 5);
+                } else {
+                    // Inside target window
+                    axonIncrementAmount = 0.0;
+                    LEDCon(led, 4);
+                }
+                telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
+            }
+            else{
+                //Recenter the turret to 0 degrees(straight ahead), keep the sign so it turns back toward center
+                double avgAng = turretCurrentHeading;
+                if (Math.abs(avgAng) > autoVariation) {
+                    // Power scales with error
+                    double power = kP * avgAng;
+
+                    // Add enough power to overcome friction so it doesn't stall near the target
+                    power += Math.signum(avgAng) * kStatic;
+
+                    // Cap the speed so it can't build up too much momentum
+                    power = Range.clip(power, -maxTurretPower, maxTurretPower);
+
+                    // Drive opposite the heading error
+                    axonIncrementAmount = -turretHeadingSign * power;
+                    LEDCon(led, 1);
+                } else {
+                    // Inside target window
+                    axonIncrementAmount = 0.0;
+                    LEDCon(led, 4);
+                }
+                telemetry.addData("Axon Increment Amount: ", axonIncrementAmount);
+            }
+        }
+    }
+    public void LEDCon(Servo LED, int color) {
+        /*Set the color of the LED to one of 6 colors, 0 being off.
+        0 : Turn off LED
+        1 : Red
+        2 : Orange
+        3 : Yellow
+        4 : Green
+        5 : Blue
+        6 : Purple
+        */
+        LED.setPosition(new float[]{0, .279f, .333f, .388f, .5f, .611f, .722f}[color]);
+    }
+    public void robotCentricDrive(DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR) {
+        //reverse drive depending on boolean at top
+        leftStickYVal = gamepad1.left_stick_y;
+
+        leftStickYVal = Range.clip(leftStickYVal, -1, 1);
+        rightStickYVal = gamepad1.right_stick_y;
+        rightStickYVal = Range.clip(rightStickYVal, -1, 1);
+
+        leftStickXVal = gamepad1.left_stick_x;
+        leftStickXVal = Range.clip(leftStickXVal, -1, 1);
+        rightStickXVal = gamepad1.right_stick_x;
+        rightStickXVal = Range.clip(rightStickXVal, -1, 1);
+
+        if(config1) {
+            frontLeftSpeed = leftStickYVal - rightStickXVal - leftStickXVal;    // Vertical + Rotation + Staffing
+            frontRightSpeed = leftStickYVal + rightStickXVal + leftStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
+            rearLeftSpeed = leftStickYVal + rightStickXVal - leftStickXVal;
+            rearRightSpeed = leftStickYVal - rightStickXVal + leftStickXVal;
+        }else {
+            frontLeftSpeed = leftStickYVal - leftStickXVal - rightStickXVal;    // Vertical + Rotation + Staffing
+            frontRightSpeed = leftStickYVal + leftStickXVal + rightStickXVal;   // Vertical - Rotation - Strafing(sign in front is the way the motor is turning in relation to the others)
+            rearLeftSpeed = leftStickYVal + leftStickXVal - rightStickXVal;
+            rearRightSpeed = leftStickYVal - leftStickXVal + rightStickXVal;
+        }
+
+        // Clipping motor speeds to [-1, 1]
+        frontLeftSpeed = Range.clip(frontLeftSpeed, -1, 1);
+        frontRightSpeed = Range.clip(frontRightSpeed, -1, 1);
+        rearLeftSpeed = Range.clip(rearLeftSpeed, -1, 1);
+        rearRightSpeed = Range.clip(rearRightSpeed, -1, 1);
+
+        // Setting motor powers (with threshold check)
+        setMotorPower(FL, frontLeftSpeed, powerThreshold, moveSpeedMultiply);
+        setMotorPower(FR, frontRightSpeed, powerThreshold, moveSpeedMultiply);
+        setMotorPower(BL, rearLeftSpeed, powerThreshold, moveSpeedMultiply);
+        setMotorPower(BR, rearRightSpeed, powerThreshold, moveSpeedMultiply);
+    }
+    public void setMotorPower(DcMotor motor, double speed, double threshold, double multiplier) {
+        if (speed <= threshold && speed >= -threshold) {
+            motor.setPower(0);
+        } else {
+            motor.setPower(speed * multiplier);
+        }
+    }
+    public void runTelemetry() {
+        telemetry.addLine("---------------TeleOp---------------");
+        telemetry.addData("Launcher Velocity: ", launcherMotor.getVelocity());
+        telemetry.addData("Pollen Target Velocity", pollenTargetVelocity);
+        telemetry.addData("Axon Position: %.2f Degrees", turretCurrentHeading);
+        telemetry.addData("Using Default config: ", config1);
+        telemetry.addData("Axon Increment: ", axonIncrementAmount);
+        telemetry.addData("FR", FrontRight.getPower());
+        telemetry.addData("FL", FrontLeft.getPower());
+        telemetry.addData("BR", BackRight.getPower());
+        telemetry.addData("BL", BackLeft.getPower());
+        telemetry.addData("Flower Percent: ", flowerHeight);
+        if(!useVelocity){telemetry.addData("Current Power: ", launcherMotor.getPower());}
+        telemetry.update();
+    }
+    public void calcTurretPos(){
+        double pos = (axonFeedback.getVoltage() / 3.3) * 360;
+        double delta = pos - pastAxonPosition;
+
+        // 4. FIX THE ROLLOVER: If it jumps instantly by more than half a rotation,
+        // it means the encoder just passed the 360/0 line.
+        if (delta > 180) {
+            // Wrapped backwards across the 0 line
+            delta -= 360;
+        } else if (delta < -180) {
+            // Wrapped forwards across the 360 line
+            delta += 360;
+        }
+        totalAxonTravel += delta;
+        turretCurrentHeading = totalAxonTravel / 2.5;
+        pastAxonPosition = pos;
+
+    }
+    public void inputHandling(){
+        //Toggle launcher
+        if(gamepad2.rightTriggerWasPressed()){launcherTrigger = !launcherTrigger;}
+        //Toggle intake
+        if(gamepad1.leftTriggerWasPressed()){intakeTrigger = !intakeTrigger;}
+        //Toggle transfer servo
+        if(gamepad2.aWasPressed()){transferTrigger = !transferTrigger;}
+        //Step once per press, not every loop while held
+        if(gamepad2.dpadDownWasPressed()){pollenTargetVelocity = Math.max(0, pollenTargetVelocity - velocityStep);}
+        if(gamepad2.dpadUpWasPressed()){pollenTargetVelocity += velocityStep;}
+        if(gamepad2.dpadLeftWasPressed()){flowerHeight -= .01;}
+        if(gamepad2.dpadRightWasPressed()){flowerHeight += .01;}
+
+        if(gamepad2.rightBumperWasPressed()){useVelocity = !useVelocity;}
+
+        if(gamepad1.xWasPressed()){config1 = !config1;}
+
+        if(gamepad1.dpadUpWasPressed()){
+            blueTeam = !blueTeam;
+            //Switch LED strip color based on blueteam var
+            LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(blueTeam ? Color.BLUE : Color.RED));
+            stripOnTarget = false;
+        }
+
+        if(gamepad2.xWasPressed()){flowerAxonTrigger = !flowerAxonTrigger;}
+
+        //Zero the turret, wherever it is now becomes 0 degrees
+        if(gamepad2.rightStickButtonWasPressed()){
+            totalAxonTravel = 0;
+            turretCurrentHeading = 0;
+            //Restart rollover tracking from the current encoder reading so the next calcTurretPos() doesn't jump
+            pastAxonPosition = (axonFeedback.getVoltage() / 3.3) * 360;
+        }
+    }
+    public void runLauncher(){
+        //Velocity control when on, coast down when off instead of braking the flywheel
+        if(launcherTrigger){
+            if(useVelocity) {
+                burnerLaunch(pollenTargetVelocity, 2);
+            }
+            else{
+                launcherMotor.setPower(.8f);
+                LEDCon(led, 2);
+            }
+        }
+        else{launcherMotor.setPower(0);}
+    }
+    public void burnerLaunch(double launchSpeed, double aggressiveness) {
+        if (launcherMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        double now = OpModeTimer.seconds();
+        double dt = now - last;
+        last = now;
+        //Set dt increment to reasonable value
+        if(dt<=0 || dt>.1){dt = 0.02;}
+
+        double currentVelocity = launcherMotor.getVelocity();
+        double error = launchSpeed - currentVelocity;
+
+        double kP = BASE_kP * aggressiveness;
+        double kI = BASE_kI * aggressiveness;
+        double kD = BASE_kD * aggressiveness;
+
+        double pTerm = error * kP;
+
+        if (Math.abs(error) < 300) {
+            integralSum += error * dt;
+        }
+        double iTerm = integralSum * kI;
+
+        double derivative = (error - lastError) / dt;
+        double dTerm = derivative * kD;
+        lastError = error;
+
+        double fTerm = launchSpeed * kF;
+        //Ramp up power faster if under 40 under target
+        double power = error > 40 ? 1 : Range.clip(pTerm + iTerm + dTerm + fTerm, 0, 1.0);
+        launcherMotor.setPower(power);
+        //Only go if wanting to fire
+        if(transferTrigger){
+            if (currentVelocity > launchSpeed - 30) {
+                transferServo.setPower(1);
+                pollenServo.setPower(-1);
+                spinNoBackServo.setPower(-1);
+                intakeMotor.setPower(-1);
+                //Only stop feeding if ball was just launched
+            } else if(currentVelocity < launchSpeed - 60){
+                transferServo.setPower(0);
+                pollenServo.setPower(0);
+            }
+        }
+        else{
+            transferServo.setPower(0);
+            pollenServo.setPower(0);
+        }
+    }
+    public void runMotors(){
+        //Check if any movement inputs are greater than .2 deadzone
+        if(Math.max(Math.max(Math.abs(gamepad1.left_stick_x), Math.abs(gamepad1.left_stick_y)), Math.abs(gamepad1.right_stick_x)) > .2 && !gamepad2.left_bumper){
+            //Apply motor power based on established triggers from inputHandling(), add dampening
+            double intakeDirection = gamepad1.left_bumper ? .6 : -.6;
+            intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
+            //intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
+        }
+        else {
+            //Apply motor power based on established triggers from inputHandling()
+            int intakeDirection = gamepad1.left_bumper ? 1 : -1;
+            intakeMotor.setPower(intakeTrigger ? intakeDirection : 0);
+            //intakeMotorTwo.setPower(intakeTrigger ? intakeDirection : 0);
+        }
+
+        //Launcher and feed (overridden by LerpTeleOP)
+        runLauncher();
+
+        //Move the transfer servo with += .1 deadzone
+        double turretPower = axonIncrementAmount == 0.0 ? (Math.abs(gamepad2.left_stick_x) > 0.1 ? gamepad2.left_stick_x : 0) : axonIncrementAmount;
+        //Soft limits, don't let the turret go past maxTurretAngle either way (auto or manual)
+        double headingChange = turretPower * turretHeadingSign;
+        if ((turretCurrentHeading > maxTurretAngle && headingChange > 0) || (turretCurrentHeading < -maxTurretAngle && headingChange < 0)) {
+            turretPower = 0;
+        }
+        turretServo.setPower(turretPower);
+        axonIncrementAmount = 0.0;
+
+
+
+        //Moves the flower axon servo to an up position of 0, and down position of .4.
+        flowerAxon.setPosition(flowerAxonTrigger ? gamepad2.dpad_up ? .2 : flowerHeight : 0);
+    }
+    @Override
+    public void start(){
+        OpModeTimer.reset();
+    }
+    @Override
+    public void init() {
+        OpModeTimer = new Timer();
+        //Init IMU
+        imu = addIMU(hardwareMap, "imu", true, false);
+
+        //Init Mecanum Drive
+        FrontRight = addMotor(hardwareMap, "FR", false, true);
+        FrontLeft = addMotor(hardwareMap, "FL", true, true);
+        BackRight = addMotor(hardwareMap, "BR", false, true);
+        BackLeft = addMotor(hardwareMap, "BL", true, true);
+
+        //Extra Motors
+        intakeMotor = addMotor(hardwareMap, "intake", true, true);
+        //intakeMotorTwo= addMotor(hardwareMap, "intakeTwo", true, true);
+        launcherMotor = addMotorEx(hardwareMap, "launcher", true, false, true);//Float so the flywheel coasts
+
+        //Init servos
+        transferServo = addCRServo(hardwareMap, "transfer", true);
+        turretServo = addCRServo(hardwareMap, "turret", true);
+        pollenServo = addCRServo(hardwareMap, "pollen", true);
+        spinNoBackServo = addCRServo(hardwareMap, "spinNoBack", true);
+        flowerAxon = addServo(hardwareMap, "flowerAxon", true);
+
+
+        //Analogue Input
+        axonFeedback = addAnalogueInput(hardwareMap, "axon");
+
+        //Init odometry
+        odo = addOdometry(hardwareMap, "ODO", 0, 25, true, false);
+
+        //Init LEDs
+        led = addServo(hardwareMap, "LED", true);
+        LEDStrip = hardwareMap.get(GoBildaPrismDriver.class, "PRISM");
+        LEDStrip.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, new PrismAnimations.Solid(blueTeam ? Color.BLUE : Color.RED));
+
+        //Init the limelight camera for April Tag detection
+        limelight = addLimelight(hardwareMap, "LL");
+
+        //Init axon position
+        pastAxonPosition = (axonFeedback.getVoltage() / 3.3) * 360;
+    }
+    @Override
+    public void init_loop() {
+        //Poll limelight before start is pressed
+        if (limelight.isConnected()) {
+            telemetry.addData("Limelight Status", "CONNECTED & TRACKING TAGS!");
+            LEDCon(led, 4);
+        } else {
+            telemetry.addData("Limelight Status", "Connecting... (Ensure Panels is closed)");
+            LEDCon(led, 1);
+        }
+        telemetry.update();
+    }
+    @Override
+    public void loop(){
+        //Robot Centric Drive - Mecanum, 4 wheel
+        robotCentricDrive(FrontLeft, FrontRight, BackRight, BackLeft);
+
+        //Odometry
+        odo.update();
+
+        //Control the input triggers
+        inputHandling();
+
+        //Limelight and targeting
+        autoTarget();
+
+        //Update the turret position
+        calcTurretPos();
+
+        //Drive all the motors based on triggers
+        runMotors();
+
+        //Telemetry
+        runTelemetry();
+    }
+}
