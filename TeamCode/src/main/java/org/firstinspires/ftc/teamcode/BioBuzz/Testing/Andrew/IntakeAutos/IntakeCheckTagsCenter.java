@@ -41,8 +41,8 @@ public class IntakeCheckTagsCenter extends IntakeCheckHiveAuto {
         secondShotAngle = 0;
 
         //Velocities
-        firstShotVelocity = 1080;
-        secondShotVelocity = 1080;
+        firstShotVelocity = 955;
+        secondShotVelocity = 955;
 
         //AutoMain init
         setup();

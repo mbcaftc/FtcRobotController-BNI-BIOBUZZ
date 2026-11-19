@@ -36,6 +36,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
     public Pose nav3Far;
     public Pose nav4Far;
 
+    public Pose returnNavUnderHive;
     public Pose nav3Close;
     //Parking Pose
     public Pose parkingPose;
@@ -106,7 +107,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                         line(nav2, secondShotFar).constant(secondShotFar));
 
 
-        navUnderHive = path(line(secondShotFar, secondShotClose).constant(secondShotClose));
+        navUnderHive = path(line(secondShotFar, secondShotClose).linear(secondShotFar, secondShotClose, .15));
 
         //Navigate from final shot to the parking position.
         shootClose_to_park = path(line(secondShotClose, nav3Close).tangent(),
@@ -129,7 +130,6 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                 turretAngle = firstShotAngle;
                 launch(firstShotVelocity);
                 if (opmodeTimer.seconds() > firstShotTime) {
-                    turretAngle = 0;
                     cutPower();
                     launcherMotor.setVelocity(secondShotVelocity);
                     movePath(start_to_intake);
@@ -168,7 +168,9 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                 }
                 else{
                     //Check if the tag detection rate is larger than window
-                    current = (totalTagsDetected / timesDetected > minTagAccuracy) ? autoState.SHOOTTWOATHIVE : autoState.DRIVEUNDERHIVE;
+                    boolean shootFar = (totalTagsDetected / timesDetected > minTagAccuracy);
+                    current = shootFar ? autoState.STARTSHOOT : autoState.DRIVEUNDERHIVE;
+                    turretAngle = shootFar ? firstShotAngle : secondShotAngle;
                 }
                 break;
 
@@ -193,7 +195,6 @@ public class IntakeCheckHiveAuto extends MovmentMain {
             case SHOOTTWOATHIVE:
                 launch(secondShotVelocity);
                 if (opmodeTimer.seconds() - secondShotStart > secondShotTime) {
-                    turretAngle = 0;
                     cutPower();
                     movePath(shootFar_to_park);
                     current = autoState.PARK;

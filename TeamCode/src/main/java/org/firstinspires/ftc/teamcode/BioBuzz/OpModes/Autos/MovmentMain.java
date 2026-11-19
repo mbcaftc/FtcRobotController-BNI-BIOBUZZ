@@ -19,6 +19,7 @@ public class MovmentMain extends AutoMain{
     protected static  UniPose MidAroundCloseHive = new UniPose(84, 72);//this is close to flower//4
     protected static  UniPose MidAroundCloseHumans = new UniPose (124, 72 );//this is close to humans//5
     protected static  UniPose StartFarLeft = new UniPose(83, 132);//6
+    protected static  UniPose StartFarLeftFront = new UniPose(83, 120);
     protected static final UniPose StartFarLeftTileRight = new UniPose(107, 132);//StartFarLeft moved one tile (24 in) right
     protected static final UniPose StartRightRight = new UniPose(106, 132);//7
 
@@ -42,6 +43,7 @@ public class MovmentMain extends AutoMain{
     //Short sideways move where the robot turns from 270 to 0 on the way to the loose balls
     protected static final UniPose TurnPoint = new UniPose(95, 115.5);
     protected static final UniPose RightBackCorner = new UniPose(135.5, 7.5);
+
 
     //When to go to park as failsafe (0-30 seconds from start, recommended 25)
     public double maxTimeBreakout = 25;
