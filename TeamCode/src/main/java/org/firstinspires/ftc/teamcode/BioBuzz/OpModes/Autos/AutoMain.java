@@ -172,12 +172,21 @@ public void init(){}//do not add anything needed for opmode to compile
     double last = 0;
 
 
+    public void primeForLaunch(){
+        integralSum = 0;
+        lastError = 0;
+        last = opmodeTimer.seconds();
+    }
+
     public void burnerLaunch(double launchSpeed, double aggressiveness) {
         if (launcherMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
             launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        double dt = last = opmodeTimer.seconds();
-        last = opmodeTimer.seconds();
+        double now = opmodeTimer.seconds();
+        double dt = now - last;
+        last = now;
+        //Set dt increment to reasonable value
+        if(dt<=0 || dt>.1){dt = 0.02;}
 
         double currentVelocity = launcherMotor.getVelocity();
         double error = launchSpeed - currentVelocity;
@@ -190,6 +199,7 @@ public void init(){}//do not add anything needed for opmode to compile
 
         if (Math.abs(error) < 300) {
             integralSum += error * dt;
+            integralSum = Range.clip(integralSum, -.2 / kI, .2 / kI);
         } else {
             integralSum = 0;
         }
@@ -201,7 +211,7 @@ public void init(){}//do not add anything needed for opmode to compile
 
         double fTerm = launchSpeed * kF;
 
-        double power = Range.clip(pTerm + iTerm + dTerm + fTerm, -1.0, 1.0);
+        double power = Range.clip(pTerm + iTerm + dTerm + fTerm, 0, 1.0);
         launcherMotor.setPower(power);
 
         if (currentVelocity > launchSpeed - 50) {
@@ -215,8 +225,6 @@ public void init(){}//do not add anything needed for opmode to compile
             transferServo.setPower(0);
             pollenServo.setPower(0);
             spinNoBackServo.setPower(0);
-            intakeMotor.setPower(0);
-            intakeMotorTwo.setPower(0);
         }
     }
 

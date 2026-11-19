@@ -82,6 +82,7 @@ public class CloseCheckHive extends MovmentMain {
             case STARTSHOOT:
                 //Store the time that the shooting starts
                 shotStart = opmodeTimer.seconds();
+                primeForLaunch();
                 current = autoState.SHOOTATHIVE;
                 break;
 

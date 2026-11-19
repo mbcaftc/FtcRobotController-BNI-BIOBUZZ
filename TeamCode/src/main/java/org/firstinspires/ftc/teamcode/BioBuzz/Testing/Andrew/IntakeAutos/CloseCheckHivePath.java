@@ -13,7 +13,7 @@ public class CloseCheckHivePath extends CloseCheckHive {
 
         parkingPose = ParkPoseB.setDeg(180);
 
-        shotTime = 7.5;
+        shotTime = 10;
 
         //Shot Angles
         shotAngle = 0;
@@ -21,7 +21,7 @@ public class CloseCheckHivePath extends CloseCheckHive {
         //Velocities
         shotVelocity = 955;
 
-        initialDelay = 17;
+        initialDelay = 13;
 
         //AutoMain init
         setup();
