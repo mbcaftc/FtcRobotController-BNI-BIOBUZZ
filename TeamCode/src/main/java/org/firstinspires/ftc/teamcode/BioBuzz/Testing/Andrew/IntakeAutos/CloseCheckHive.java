@@ -70,7 +70,7 @@ public class CloseCheckHive extends MovmentMain {
                         tagDetectionStart = opmodeTimer.seconds();
                     }
                     //Delay 1 second to detect tags
-                    if (opmodeTimer.seconds() - initialDelay - tagDetectionStart < 1) {
+                    if (opmodeTimer.seconds() - tagDetectionStart < 1) {
                         checkHive();
                     } else {
                         //Check if the tag detection rate is larger than window
