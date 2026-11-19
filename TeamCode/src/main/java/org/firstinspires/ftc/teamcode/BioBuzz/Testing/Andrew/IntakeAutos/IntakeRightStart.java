@@ -29,12 +29,12 @@ public class IntakeRightStart extends IntakeAuto {
         secondShotTime = 7.5;
 
         //Shot Angles
-        firstShotAngle = -37.5;
+        firstShotAngle = -35.5;
         secondShotAngle = 0;
 
         //Velocities
-        firstShotVelocity = 955;
-        secondShotVelocity = 950;
+        firstShotVelocity = 990;
+        secondShotVelocity = 980;
 
         //AutoMain init
         setup();

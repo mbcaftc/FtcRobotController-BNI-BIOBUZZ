@@ -74,7 +74,8 @@ public class CloseCheckHive extends MovmentMain {
                         checkHive();
                     } else {
                         //Check if the tag detection rate is larger than window
-                        current = (totalTagsDetected / timesDetected > minTagAccuracy) ? autoState.STARTSHOOT : autoState.STARTSHOOT;
+                        launcherMotor.setVelocity(shotVelocity);
+                        current = (totalTagsDetected / timesDetected > minTagAccuracy) ? autoState.STARTSHOOT : autoState.PARK;
                     }
                 }
                 break;
@@ -90,14 +91,14 @@ public class CloseCheckHive extends MovmentMain {
                 turretAngle = shotAngle;
                 burnerLaunch(shotVelocity, 2);
                 if (opmodeTimer.seconds() > shotTime + initialDelay) {
+                    cutPower();
                     current = autoState.PARK;
+                    turretAngle = 0;
+
                 }
                 break;
 
             case PARK:
-                turretAngle = 0;
-                cutPower();
-                launcherMotor.setVelocity(shotVelocity);
                 movePath(start_to_park, pathingState.PARK);
                 break;
         }
@@ -117,9 +118,9 @@ public class CloseCheckHive extends MovmentMain {
             }
 
         }
-
         //Add 1 to the times tags have been detected
-        timesDetected++;
+        if(result != null && result.isValid()){timesDetected++;}
+
 
         //Check if any tags are being seen
         if (Tags > 0) {

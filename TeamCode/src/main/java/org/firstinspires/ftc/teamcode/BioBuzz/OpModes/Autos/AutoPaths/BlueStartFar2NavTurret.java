@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.FarHiv
 @Autonomous(name = "Start_At_Hive_Right", group = "Drive")
 public class BlueStartFar2NavTurret extends FarHiveTip {
     //Degrees relative to the robot, negative is clockwise
-    public double turretTarget = -37.5;
+    public double turretTarget = -36;
 
     @Override
     public void init(){
@@ -28,17 +28,21 @@ public class BlueStartFar2NavTurret extends FarHiveTip {
         follower.update();
     }
 
-    enum TurretAutoState {SHOOTING, DRIVING, CENTER_TURRET}
-    TurretAutoState turretState = TurretAutoState.SHOOTING;
+    enum TurretAutoState {START, SHOOTING, DRIVING, CENTER_TURRET}
+    TurretAutoState turretState = TurretAutoState.START;
 
     //pathLogic runs every loop in LOOP, and again after a movePath with LOOP finishes
     @Override
     public void pathLogic(){
         switch (turretState) {
+            case START:
+                primeForLaunch();
+                turretState = TurretAutoState.SHOOTING;
+                break;
             case SHOOTING:
                 //Turn the turret while the launcher spins up
-                setTurretHeading(turretTarget);
-                launch(970, 980, 3, 1);
+                turretAngle = turretTarget;
+                burnerLaunch(990, 2);
                 if (opmodeTimer.seconds() > 10) {
                     cutPower();
                     //CRServo keeps its last power, so stop it before driving
@@ -54,11 +58,7 @@ public class BlueStartFar2NavTurret extends FarHiveTip {
                 break;
             case CENTER_TURRET:
                 //Called every loop so it stops at 0 (returns false once inside the target window)
-                if (!setTurretHeading(0)) {
-                    turretServo.setPower(0);
-                    //Hand off to MovmentMain's PARK state
-                    pathState = pathingState.PARK;
-                }
+                turretAngle = 0;
                 break;
         }
     }

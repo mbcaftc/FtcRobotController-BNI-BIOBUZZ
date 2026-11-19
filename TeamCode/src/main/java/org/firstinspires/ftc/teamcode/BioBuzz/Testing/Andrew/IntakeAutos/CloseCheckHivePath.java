@@ -19,7 +19,7 @@ public class CloseCheckHivePath extends CloseCheckHive {
         shotAngle = 0;
 
         //Velocities
-        shotVelocity = 955;
+        shotVelocity = 965;
 
         initialDelay = 13;
 

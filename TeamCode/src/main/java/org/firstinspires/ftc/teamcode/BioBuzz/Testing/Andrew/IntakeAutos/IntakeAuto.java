@@ -64,7 +64,7 @@ public class IntakeAuto extends MovmentMain {
     public double intakeSpeed = .6;
 
     //StateMachine init
-    public enum autoState {START, INTAKE, HOLDINTAKE, NAVTOSHOOT, STARTSHOOT, SHOOTTWO, CENTERTURRET, PARK, END}
+    public enum autoState {PRESTART, START, INTAKE, HOLDINTAKE, NAVTOSHOOT, STARTSHOOT, SHOOTTWO, CENTERTURRET, PARK, END}
     public autoState current = autoState.START;
 
 
@@ -95,9 +95,13 @@ public class IntakeAuto extends MovmentMain {
 
         switch(current){
             //Launch Before moving
+            case PRESTART:
+                primeForLaunch();
+                current = autoState.START;
+                break;
             case START:
                 turretAngle = firstShotAngle;
-                launch(firstShotVelocity);
+                burnerLaunch(firstShotVelocity, 2);
                 if (opmodeTimer.seconds() > firstShotTime) {
                     turretAngle = 0;
                     cutPower();
@@ -132,10 +136,11 @@ public class IntakeAuto extends MovmentMain {
                 //Store the time that the shooting starts
                 secondShotStart = opmodeTimer.seconds();
                 current = autoState.SHOOTTWO;
+                primeForLaunch();
                 break;
             
             case SHOOTTWO:
-                launch(secondShotVelocity);
+                burnerLaunch(secondShotVelocity, 2);
                 if (opmodeTimer.seconds() - secondShotStart > secondShotTime) {
                     turretAngle = 0;
                     cutPower();

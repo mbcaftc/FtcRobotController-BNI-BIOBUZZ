@@ -199,9 +199,6 @@ public void init(){}//do not add anything needed for opmode to compile
 
         if (Math.abs(error) < 300) {
             integralSum += error * dt;
-            integralSum = Range.clip(integralSum, -.2 / kI, .2 / kI);
-        } else {
-            integralSum = 0;
         }
         double iTerm = integralSum * kI;
 
@@ -210,21 +207,21 @@ public void init(){}//do not add anything needed for opmode to compile
         lastError = error;
 
         double fTerm = launchSpeed * kF;
-
-        double power = Range.clip(pTerm + iTerm + dTerm + fTerm, 0, 1.0);
+        //Ramp up power faster if under 40 under target
+        double power = error > 40 ? 1 : Range.clip(pTerm + iTerm + dTerm + fTerm, 0, 1.0);
         launcherMotor.setPower(power);
 
-        if (currentVelocity > launchSpeed - 50) {
+        if (currentVelocity > launchSpeed - 30) {
             transferServo.setPower(1);
             pollenServo.setPower(-1);
             spinNoBackServo.setPower(-1);
             intakeMotor.setPower(-1);
             intakeMotorTwo.setPower(-1);
-        } else {
+            //Only stop feeding if ball was just launched
+        } else if(currentVelocity < launchSpeed - 60){
             shotTimer.reset();
             transferServo.setPower(0);
             pollenServo.setPower(0);
-            spinNoBackServo.setPower(0);
         }
     }
 
