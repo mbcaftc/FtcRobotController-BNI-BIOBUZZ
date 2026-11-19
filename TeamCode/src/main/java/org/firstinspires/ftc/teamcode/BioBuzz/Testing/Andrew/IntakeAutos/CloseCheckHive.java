@@ -57,7 +57,7 @@ public class CloseCheckHive extends MovmentMain {
 
     @Override
     public void pathLogic(){
-
+        telemetry.addData("Path state: ", current);
         switch(current){
             //Launch Before moving
             case START:
@@ -65,16 +65,17 @@ public class CloseCheckHive extends MovmentMain {
                 break;
 
             case CHECKHIVES:
-                if(tagDetectionStart == -1 && opmodeTimer.seconds() > initialDelay){
-                    tagDetectionStart = opmodeTimer.seconds();
-                }
-                //Delay 1 second to detect tags
-                if(opmodeTimer.seconds() - tagDetectionStart < 1){
-                    checkHive();
-                }
-                else{
-                    //Check if the tag detection rate is larger than window
-                    current = (totalTagsDetected / timesDetected > minTagAccuracy) ? autoState.STARTSHOOT : autoState.PARK;
+                if(opmodeTimer.seconds() > initialDelay) {
+                    if (tagDetectionStart == -1) {
+                        tagDetectionStart = opmodeTimer.seconds();
+                    }
+                    //Delay 1 second to detect tags
+                    if (opmodeTimer.seconds() - initialDelay - tagDetectionStart < 1) {
+                        checkHive();
+                    } else {
+                        //Check if the tag detection rate is larger than window
+                        current = (totalTagsDetected / timesDetected > minTagAccuracy) ? autoState.STARTSHOOT : autoState.STARTSHOOT;
+                    }
                 }
                 break;
 
@@ -87,7 +88,7 @@ public class CloseCheckHive extends MovmentMain {
             case SHOOTATHIVE:
                 turretAngle = shotAngle;
                 burnerLaunch(shotVelocity, 2);
-                if (opmodeTimer.seconds() > shotTime) {
+                if (opmodeTimer.seconds() > shotTime + initialDelay) {
                     current = autoState.PARK;
                 }
                 break;
