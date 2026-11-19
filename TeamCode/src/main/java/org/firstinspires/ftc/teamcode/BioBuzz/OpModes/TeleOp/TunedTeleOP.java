@@ -418,7 +418,7 @@ public class TunedTeleOP extends OpMode{
 
 
         if(gamepad2.bWasPressed()){pollenTargetVelocity = 955;}
-        if(gamepad2.xWasPressed()){pollenTargetVelocity = 1000;}
+        if(gamepad2.xWasPressed()){pollenTargetVelocity = 1055;}
         //Zero the turret, wherever it is now becomes 0 degrees
         if(gamepad2.rightStickButtonWasPressed()){
             totalAxonTravel = 0;
