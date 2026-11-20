@@ -84,7 +84,7 @@ public class IntakeAuto extends MovmentMain {
                         line(nav2, secondShot).constant(secondShot));
         
         //Navigate from final shot to the parking position.
-        shoot_to_park = path(line(secondShot, nav3).tangent(),
+        shoot_to_park = path(line(secondShot, nav3).tangent().with(MainConstants.foresightConfig.maxPathSpeed.at(intakeSpeed)),
                              line(nav3, nav4).tangent(),
                              line(nav4, parkingPose).constant(parkingPose));
 
