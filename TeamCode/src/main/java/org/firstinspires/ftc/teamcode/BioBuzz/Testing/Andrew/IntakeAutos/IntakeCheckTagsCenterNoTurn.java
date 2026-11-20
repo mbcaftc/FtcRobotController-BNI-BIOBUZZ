@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.UniPose;
 
+@Disabled
 @Autonomous(name = "IntakeAutoCheckCenterBlueNoTurn", group = "Intake")
 public class IntakeCheckTagsCenterNoTurn extends IntakeCheckHiveAuto {
     @Override

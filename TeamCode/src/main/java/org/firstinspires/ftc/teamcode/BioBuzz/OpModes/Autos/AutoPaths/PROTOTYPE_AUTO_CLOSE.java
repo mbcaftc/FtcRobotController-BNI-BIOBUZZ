@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoPaths;
 
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.TwoPathMain;
 
 //Reinstated Blue_CloseLeft_One_A as of 16f8b21 (lerp shooting). Move to shoot, shoot, move straight to park.
+@Disabled
 @Autonomous(name = "PROTOTYPE_AUTO_CLOSE", group = "Drive")
 public class PROTOTYPE_AUTO_CLOSE extends TwoPathMain {
     //Seconds to wait after start before moving
