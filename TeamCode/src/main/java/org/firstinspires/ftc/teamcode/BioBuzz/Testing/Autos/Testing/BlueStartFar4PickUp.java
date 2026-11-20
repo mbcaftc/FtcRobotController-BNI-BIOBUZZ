@@ -87,7 +87,7 @@ public class BlueStartFar4PickUp extends MovmentMain {
     public void pathLogic(){
         switch(currentState){
             case SHOOTING:
-                launch(shootSpeed, 980, 3, 1);
+                burnerLaunch(shootSpeed, 2);
                 if (opmodeTimer.seconds() > shootEndTime) {
                     cutPower();
                     currentState = ScoringState.OFF_WALL;
