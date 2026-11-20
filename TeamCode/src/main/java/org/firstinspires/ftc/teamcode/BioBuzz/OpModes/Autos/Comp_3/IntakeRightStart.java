@@ -1,13 +1,15 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos;
+package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.Comp_3;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "IntakeAuto", group = "Intake")
-public class IntakeCenterStart extends IntakeAuto {
+import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos.IntakeAuto;
+
+@Autonomous(name = "RightIntakeAuto", group = "Intake")
+public class IntakeRightStart extends IntakeAuto {
     @Override
     public void init(){
         //Starting Position
-        startPose = StartFarLeft.setDeg(270);
+        startPose = StartFarLeftTileRight.setDeg(270);
         //Navigate to the intake position
         nav1 = TurnPoint.setDeg(0);
         //Start intake position
@@ -29,12 +31,12 @@ public class IntakeCenterStart extends IntakeAuto {
         secondShotTime = 7.5;
 
         //Shot Angles
-        firstShotAngle = 0;
+        firstShotAngle = -35.5;
         secondShotAngle = 0;
 
         //Velocities
-        firstShotVelocity = 1080;
-        secondShotVelocity = 1080;
+        firstShotVelocity = 990;
+        secondShotVelocity = 980;
 
         //AutoMain init
         setup();

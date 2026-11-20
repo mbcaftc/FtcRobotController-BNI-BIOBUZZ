@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.BioBuzz.OpModes.TeleOp;
+package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.TeleOps;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addAnalogueInput;
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addCRServo;
@@ -31,6 +31,7 @@ import org.firstinspires.ftc.teamcode.BioBuzz.Constructors.Prism.PrismAnimations
 
 import java.util.Collections;
 import java.util.List;
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TesterTeleOP", group = "Debug")
 public class SimpleTeleOP extends OpMode{
     public SimpleTeleOP() {}
