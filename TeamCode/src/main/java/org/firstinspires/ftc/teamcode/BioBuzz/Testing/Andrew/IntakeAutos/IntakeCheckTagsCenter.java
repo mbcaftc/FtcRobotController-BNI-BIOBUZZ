@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Comp_3_IntakeAutoCheckCenterBlue", group = "Comp3_Untested")
+import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.UniPose;
+
+@Autonomous(name = "Comp3_IntakeCheckCenter", group = "Comp3_Untested")
 public class IntakeCheckTagsCenter extends IntakeCheckHiveAuto {
     @Override
     public void init(){
@@ -24,6 +26,7 @@ public class IntakeCheckTagsCenter extends IntakeCheckHiveAuto {
 
         nav3Close = Quadrant3Center.setDeg(90);
         secondShotClose = Quadrant3Back.setDeg(90);
+        hiveNavPoint = new UniPose(83, 18).setDeg(270);
 
 
         //Parking Pose

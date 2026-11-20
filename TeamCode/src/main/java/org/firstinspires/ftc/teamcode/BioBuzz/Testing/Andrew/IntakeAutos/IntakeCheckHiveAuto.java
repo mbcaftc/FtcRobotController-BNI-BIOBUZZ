@@ -30,6 +30,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
     //Second shooting pose
     public Pose secondShotFar;
     public Pose secondShotClose;
+    public Pose hiveNavPoint;
 
     public Pose secondShotCloseNav1;
     //Control points for parking navigation
@@ -107,7 +108,11 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                         line(nav2, secondShotFar).constant(secondShotFar));
 
 
-        navUnderHive = path(line(secondShotFar, secondShotClose).linear(secondShotFar, secondShotClose, .15));
+        navUnderHive = path(
+                line(secondShotFar, hiveNavPoint).constant(hiveNavPoint),
+                line(hiveNavPoint, secondShotClose).constant(secondShotClose)
+        );
+
 
         //Navigate from final shot to the parking position.
         shootClose_to_park = path(line(secondShotClose, nav3Close).tangent(),
