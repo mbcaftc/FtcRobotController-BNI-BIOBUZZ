@@ -154,6 +154,7 @@ public class MovmentMain extends AutoMain{
 
             case PARK:
                 if (!(follower.isBusy())) {
+                    cutPower();//in here so in case picks up on way to finish
                     pathState = pathingState.END;
                 }
                 break;
