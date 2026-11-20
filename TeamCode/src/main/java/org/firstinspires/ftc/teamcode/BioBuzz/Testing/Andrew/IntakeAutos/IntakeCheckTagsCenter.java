@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "IntakeAutoCheckCenterBlue", group = "Intake")
+@Autonomous(name = "Comp_3_IntakeAutoCheckCenterBlue", group = "Comp3_Untested")
 public class IntakeCheckTagsCenter extends IntakeCheckHiveAuto {
     @Override
     public void init(){
@@ -41,8 +41,8 @@ public class IntakeCheckTagsCenter extends IntakeCheckHiveAuto {
         secondShotAngle = 0;
 
         //Velocities
-        firstShotVelocity = 955;
-        secondShotVelocity = 955;
+        firstShotVelocity = 965;
+        secondShotVelocity = 965;
 
         //AutoMain init
         setup();

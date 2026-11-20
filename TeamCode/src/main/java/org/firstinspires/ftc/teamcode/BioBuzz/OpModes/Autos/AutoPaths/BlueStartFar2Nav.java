@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.FarHiveTip;
 
-@Autonomous(name = "Start_At_Hive", group = "Drive")
+@Autonomous(name = "Comp3_Start_At_Hive", group = "Comp3_Untested")
 public class BlueStartFar2Nav extends FarHiveTip {
     @Override
     public void init(){

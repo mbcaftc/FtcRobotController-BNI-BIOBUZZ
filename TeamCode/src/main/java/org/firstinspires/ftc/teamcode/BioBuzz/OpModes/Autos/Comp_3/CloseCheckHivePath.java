@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos.CloseCheckHive;
 
-@Autonomous(name = "CheckHivesClose", group = "Close")
+@Autonomous(name = "Comp3_CheckHivesClose", group = "Comp3")
 public class CloseCheckHivePath extends CloseCheckHive {
     @Override
     public void init(){

@@ -1,4 +1,7 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.TeleOps;
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 @Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "BlueTeleOP", group = "Drive")
 public class BlueTeleOP extends AllianceTeleOP {

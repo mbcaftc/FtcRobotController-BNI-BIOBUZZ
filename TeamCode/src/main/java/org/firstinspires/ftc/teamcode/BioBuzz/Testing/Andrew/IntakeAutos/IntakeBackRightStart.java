@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name = "IntakeAutoBackCorner", group = "Intake")
+@Disabled
+@Autonomous(name = "IntakeAutoBackCorner", group = "Bad")
 public class IntakeBackRightStart extends IntakeAuto {
     @Override
     public void init(){

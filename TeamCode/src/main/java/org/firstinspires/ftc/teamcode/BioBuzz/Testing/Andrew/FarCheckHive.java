@@ -22,6 +22,7 @@ import java.util.List;
 //  - Tags seen: shoot from the start pose, then follow the ShootFarUnderHive path to park
 //  - No tags: drive under the hive, turn around in place to face it (90), shoot, then park
 //Reuses BlueStartFar4PickUp's paths and settings, so tuning that auto also tunes this one
+@Disabled
 @Autonomous(name = "Far_Check_Hive", group = "Debug")
 public class FarCheckHive extends BlueStartFar4PickUp {
     //Front hive April Tag IDs for both alliances (same as RedTeleOP / BlueTeleOP). Back hive tags (red 30-33, blue 42-45) are ignored

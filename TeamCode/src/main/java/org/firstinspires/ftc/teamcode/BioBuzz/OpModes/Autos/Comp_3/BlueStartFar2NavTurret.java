@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.BioBuzz.OpModes.Autos.AutoTemplates.FarHiveTip;
 
 //Same as Start_At_Hive, but starts one tile (24 inches) right of it and turns the turret 37.5 degrees clockwise while the launcher spins up
-@Autonomous(name = "Start_At_Hive_Right", group = "Drive")
+@Autonomous(name = "Comp3_Start_At_Hive_Right", group = "Comp3")
 public class BlueStartFar2NavTurret extends FarHiveTip {
     //Degrees relative to the robot, negative is clockwise
     public double turretTarget = -36;

@@ -128,7 +128,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
             //Launch Before moving
             case START:
                 turretAngle = firstShotAngle;
-                launch(firstShotVelocity);
+                burnerLaunch(firstShotVelocity, 2);
                 if (opmodeTimer.seconds() > firstShotTime) {
                     cutPower();
                     launcherMotor.setVelocity(secondShotVelocity);
@@ -193,7 +193,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                 break;
             
             case SHOOTTWOATHIVE:
-                launch(secondShotVelocity);
+                burnerLaunch(secondShotVelocity, 2);
                 if (opmodeTimer.seconds() - secondShotStart > secondShotTime) {
                     cutPower();
                     movePath(shootFar_to_park);
@@ -202,7 +202,7 @@ public class IntakeCheckHiveAuto extends MovmentMain {
                 break;
 
             case SHOOTTWOATCLOSE:
-                launch(secondShotVelocity);
+                burnerLaunch(secondShotVelocity, 2);
                 if (opmodeTimer.seconds() - secondShotStart > secondShotTime) {
                     turretAngle = 0;
                     cutPower();

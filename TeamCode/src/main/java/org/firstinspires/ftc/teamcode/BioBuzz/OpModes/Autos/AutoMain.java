@@ -212,11 +212,10 @@ public void init(){}//do not add anything needed for opmode to compile
         launcherMotor.setPower(power);
 
         if (currentVelocity > launchSpeed - 30) {
-            transferServo.setPower(1);
-            pollenServo.setPower(-1);
+            transferServo.setPower(.7);
+            pollenServo.setPower(-.7);
             spinNoBackServo.setPower(-1);
             intakeMotor.setPower(-1);
-            intakeMotorTwo.setPower(-1);
             //Only stop feeding if ball was just launched
         } else if(currentVelocity < launchSpeed - 60){
             shotTimer.reset();

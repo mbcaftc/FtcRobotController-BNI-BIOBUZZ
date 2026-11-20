@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos.IntakeAuto;
 
-@Autonomous(name = "IntakeAuto", group = "Intake")
+@Autonomous(name = "Comp_3_IntakeAuto", group = "Comp3")
 public class IntakeCenterStart extends IntakeAuto {
     @Override
     public void init(){
@@ -35,8 +35,8 @@ public class IntakeCenterStart extends IntakeAuto {
         secondShotAngle = 0;
 
         //Velocities
-        firstShotVelocity = 1080;
-        secondShotVelocity = 1080;
+        firstShotVelocity = 965;
+        secondShotVelocity = 965;
 
         //AutoMain init
         setup();

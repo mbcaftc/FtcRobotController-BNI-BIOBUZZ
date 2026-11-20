@@ -10,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Autos.Testing.BlueStartFar4PickUp;
 import org.firstinspires.ftc.teamcode.BioBuzz.pedro.MainConstants;
@@ -22,6 +23,7 @@ import java.util.List;
 //  - Tags seen: shoot from the start pose, then follow the ShootFarUnderHive path to park
 //  - No tags: drive under the hive, turn around in place to face it (90), shoot, then park
 //Reuses BlueStartFar4PickUp's paths and settings, so tuning that auto also tunes this one
+@Disabled
 @Autonomous(name = "Far_Check_Hive_ParkA", group = "Debug")
 public class FarCheckHiveParkA extends BlueStartFar4PickUp {
     //Front hive April Tag IDs for both alliances (same as RedTeleOP / BlueTeleOP). Back hive tags (red 30-33, blue 42-45) are ignored
