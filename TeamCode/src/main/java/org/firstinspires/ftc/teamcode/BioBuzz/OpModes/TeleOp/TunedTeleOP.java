@@ -152,7 +152,9 @@ public class TunedTeleOP extends OpMode{
     boolean flowerAxonTrigger = false;
     //</editor-fold>
     //<editor-fold desc="Launching Variables">
-    public double pollenTargetVelocity = 955;
+    public double pollenNearVelocity = 930;
+    public double pollenFarVelocity = 1055;
+    public double pollenTargetVelocity = pollenNearVelocity;
     public double nectarTargetVelocity = 1200;
     public double velocityStep = 25;//Ticks/sec changed per dpad press
     public double axonIncrementAmount = 0;
@@ -417,8 +419,8 @@ public class TunedTeleOP extends OpMode{
         }
 
 
-        if(gamepad2.bWasPressed()){pollenTargetVelocity = 955;}
-        if(gamepad2.xWasPressed()){pollenTargetVelocity = 1055;}
+        if(gamepad2.bWasPressed()){pollenTargetVelocity = pollenNearVelocity;}
+        if(gamepad2.xWasPressed()){pollenTargetVelocity = pollenFarVelocity;}
         //Zero the turret, wherever it is now becomes 0 degrees
         if(gamepad2.rightStickButtonWasPressed()){
             totalAxonTravel = 0;
@@ -476,8 +478,8 @@ public class TunedTeleOP extends OpMode{
         //Only go if wanting to fire
         if(transferTrigger){
             if (currentVelocity > launchSpeed - 30) {
-                transferServo.setPower(1);
-                pollenServo.setPower(-1);
+                transferServo.setPower(.7);
+                pollenServo.setPower(-.7);
                 spinNoBackServo.setPower(-1);
                 intakeMotor.setPower(-1);
                 //Only stop feeding if ball was just launched
