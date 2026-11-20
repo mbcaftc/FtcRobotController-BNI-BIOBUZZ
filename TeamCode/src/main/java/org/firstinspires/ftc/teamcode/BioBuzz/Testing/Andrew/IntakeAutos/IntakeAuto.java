@@ -61,7 +61,7 @@ public class IntakeAuto extends MovmentMain {
     //Each shot Velocity
     public double firstShotVelocity;
     public double secondShotVelocity;
-    public double intakeSpeed = .6;
+    public double intakeSpeed = .5;
 
     //StateMachine init
     public enum autoState {PRESTART, START, INTAKE, HOLDINTAKE, NAVTOSHOOT, STARTSHOOT, SHOOTTWO, CENTERTURRET, PARK, END}
