@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BioBuzz.Testing.Andrew.IntakeAutos.IntakeAuto;
 
-@Autonomous(name = "Comp_3_IntakeAuto", group = "Comp3")
+@Autonomous(name = "Comp_3_IntakeAutoParkB", group = "Comp3")
 public class IntakeCenterStart extends IntakeAuto {
     @Override
     public void init(){

@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode.BioBuzz.Testing.Walter;
 
 import static org.firstinspires.ftc.teamcode.BioBuzz.Constructors.QuickRigging.addMotorEx;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-
+@Disabled
 @TeleOp(name = "Live Tune Flywheel PIDF")
 public class WaterTuning extends LinearOpMode {
 
